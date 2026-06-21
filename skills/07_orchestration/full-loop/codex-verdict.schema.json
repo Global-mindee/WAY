@@ -1,0 +1,36 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "full-loop S6 codex 이종 검수 판정 스키마 (v1.3)",
+  "type": "object",
+  "required": ["verdicts", "summary"],
+  "additionalProperties": false,
+  "properties": {
+    "verdicts": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["ac_id", "verdict", "severity", "evidence", "fix_hint"],
+        "additionalProperties": false,
+        "properties": {
+          "ac_id": { "type": "string", "description": "AC-1..n — 계획서에 고정된 ID 그대로" },
+          "verdict": { "enum": ["PASS", "FAIL", "UNVERIFIABLE"], "description": "PARTIAL성 판단은 FAIL로 (보수적)" },
+          "severity": { "enum": ["blocker", "major", "minor", "none"], "description": "blocker = 중대 버그·보안·데이터 손실 (재현 증거 필수, 합격 차단 예외 발동). PASS는 none" },
+          "evidence": { "type": "string", "description": "파일:라인 인용 또는 검증 명령의 실제 출력 요지 — 증거 없는 PASS 금지" },
+          "fix_hint": { "type": "string", "description": "FAIL 시 수정지시 1줄 (S7 차분 피드백용). PASS·UNVERIFIABLE이면 빈 문자열" }
+        }
+      }
+    },
+    "summary": {
+      "type": "object",
+      "required": ["pass_count", "total", "blocker_found", "notes"],
+      "additionalProperties": false,
+      "properties": {
+        "pass_count": { "type": "integer", "minimum": 0 },
+        "total": { "type": "integer", "minimum": 1 },
+        "blocker_found": { "type": "boolean" },
+        "notes": { "type": "string", "description": "AC 외 발견 사항 — 채점과 분리된 참고 절 (스타일·취향 평가 금지). 없으면 빈 문자열" }
+      }
+    }
+  }
+}

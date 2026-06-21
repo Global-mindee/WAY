@@ -1,0 +1,17 @@
+# logs/decisions.log
+# append-only 결재 이벤트 로그 — CLAUDE.md 결재 흐름 절
+#
+# 형식: [ISO-8601 timestamp] event-type: pending-id, detail
+#
+# 이벤트 4종:
+#   - decision-requested: pending.md 신규 등록
+#   - decision-approved: 사용자 승인
+#   - decision-rejected: 사용자 거절
+#   - decision-deferred: 사용자 보류
+#
+# 운영 데이터는 적재 금지 — 결재 이벤트의 메타 정보만 기록 (P6 단방향 격리).
+
+# (가상 예시 — 온보딩 후 실제 결재 이벤트로 대체됩니다)
+# [YYYY-MM-DDThh:mm:ssZ] decision-requested: pending#1, (예: WEB 출처 신뢰도 등급 정의)
+# [YYYY-MM-DDThh:mm:ssZ] decision-approved: pending#1, (예: 도메인별 등급화 채택)
+# [YYYY-MM-DDThh:mm:ssZ] decision-deferred: pending#2, (예: 추가 데이터 확보 후 재논의)

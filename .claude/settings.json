@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/scripts/skill-keyword-injector.js\""
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/scripts/session-start-scan.js\""
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/scripts/context-usage-monitor.js\""
+          }
+        ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/scripts/full-loop-driver.js\""
+          }
+        ]
+      }
+    ],
+    "PreCompact": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/scripts/context-usage-monitor.js\" --precompact"
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/scripts/external-impact-guard.js\""
+          }
+        ]
+      }
+    ]
+  },
+  "_comment": "project-scoped 설정 — context-management.md 8. + full-loop 드라이버 + SessionStart worktree 스캔 + UserPromptSubmit skill-keyword-injector. 글로벌 ~/.claude 미오염. SessionStart=worktree 고립 결재 경고(비차단). UserPromptSubmit 2종 채널 구분: project skill-keyword-injector(추천 skill 1줄 컨텍스트 주입, fail-open)와 글로벌 svop-injector(SVOP 출처 마커 주입)는 병존 — 역할 분리(추천 신호 vs 출처 정책). Stop 3종 공존: context-usage-monitor(CTX:)·full-loop-driver(LOOP:)·글로벌 svop-auditor — stderr 프리픽스 채널 구분, 차단 결정은 full-loop-driver만(루프 활성 시). PreToolUse(Bash)=external-impact-guard(게이트2훅: 프리픽스, 루프 활성 중 외부 영향 도구 차단 — v1.4, fail-open).",
+  "enabledPlugins": {
+    "frontend-design@claude-plugins-official": true
+  }
+}

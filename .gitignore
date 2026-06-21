@@ -1,0 +1,47 @@
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Python / Node 의존성 (혹시 모를 유입 방지)
+node_modules/
+.venv/
+venv/
+__pycache__/
+*.pyc
+
+# 로컬 임시 / 로그 raw 부산물
+*.tmp
+*.bak
+*.log.tmp
+
+# 컨텍스트 소비 모니터 로컬 산출물 (rules/context-management.md — git churn 회피)
+logs/context-usage.local.log
+logs/.ctx-state
+
+# 환경 변수·비밀
+.env
+.env.local
+*.pem
+
+# 운영 데이터 격리 (P6 정신 — Blueprint 12.)
+# projects/ 하위의 실제 운영 데이터는 외부 레포로 빠지므로
+# 여기서는 메타 정보만 추적함. 별도 격리 패턴이 필요해지면 추가
+
+# Claude Code worktree (EnterWorktree가 생성하는 독립 체크아웃 — 부모 레포에 커밋 금지)
+.claude/worktrees/
+
+# full-loop 루프 상태·로그 (세션 로컬 전용 — git churn 회피, skills/07_orchestration/full-loop)
+.claude/full-loop-state.local.json
+logs/full-loop.local.log
+
+# 날짜 접미 백업·스킬 인덱스 캐시 (세션 산물, 커밋 제외)
+*.bak-*
+logs/.skill-index-cache.json

@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>full-loop v1.4.0 — 프로세스 도해</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;700&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#F5F2EA; --card:#FDFCF8; --ink:#1C1914; --mute:#6E675B; --line:#D8D2C4; --hair:#E7E2D6;
+    --cobalt:#1A45C2; --cobalt-bg:#EDF1FC;
+    --amber:#B45309; --amber-bg:#FBF3E4;
+    --red:#B3261E;   --red-bg:#FAEDEB;
+    --green:#1A7A3C; --green-bg:#EBF4EE;
+    --teal:#0E8074;  --teal-bg:#E9F4F2;
+    --indigo:#4338CA;--indigo-bg:#EFEEFB;
+    --sans:"IBM Plex Sans KR","Apple SD Gothic Neo","Noto Sans KR",sans-serif;
+    --mono:"IBM Plex Mono","SF Mono",Menlo,monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:auto}
+  body{
+    font-family:var(--sans); background:var(--paper); color:var(--ink);
+    font-size:15px; line-height:1.65; -webkit-font-smoothing:antialiased;
+    background-image:
+      linear-gradient(var(--hair) 1px, transparent 1px),
+      linear-gradient(90deg, var(--hair) 1px, transparent 1px);
+    background-size:56px 56px;
+  }
+  .wrap{max-width:1180px;margin:0 auto;padding:0 28px 120px}
+
+  /* ── 헤더 ─────────────────────────────── */
+  header{padding:64px 0 36px;border-bottom:3px solid var(--ink);margin-bottom:0}
+  .doc-no{font-family:var(--mono);font-size:12px;letter-spacing:.14em;color:var(--mute);text-transform:uppercase}
+  h1{font-size:46px;font-weight:700;letter-spacing:-0.015em;line-height:1.15;margin:10px 0 6px}
+  h1 .mono{font-family:var(--mono);font-weight:600}
+  .subtitle{font-size:17px;color:var(--mute);margin-bottom:22px}
+  .meta-grid{display:flex;flex-wrap:wrap;gap:0;border:1.5px solid var(--ink);background:var(--card)}
+  .meta-cell{padding:10px 18px;border-right:1.5px solid var(--ink);font-size:13px}
+  .meta-cell:last-child{border-right:none}
+  .meta-cell b{display:block;font-family:var(--mono);font-size:11px;letter-spacing:.1em;color:var(--mute);font-weight:400;text-transform:uppercase;margin-bottom:2px}
+  .meta-cell span{font-family:var(--mono);font-weight:600;font-size:13.5px}
+
+  .legend{display:flex;flex-wrap:wrap;gap:10px 18px;margin-top:18px;font-size:12.5px}
+  .lg{display:inline-flex;align-items:center;gap:7px;font-family:var(--mono)}
+  .sw{width:13px;height:13px;border-radius:3px;display:inline-block;border:1.5px solid transparent}
+  .sw.main{background:var(--cobalt-bg);border-color:var(--cobalt)}
+  .sw.sub{background:var(--indigo-bg);border-color:var(--indigo)}
+  .sw.cdx{background:var(--teal-bg);border-color:var(--teal);border-style:dashed}
+  .sw.hum{background:var(--amber-bg);border-color:var(--amber);transform:rotate(45deg);border-radius:2px}
+  .sw.hk{background:#EFEDE6;border-color:var(--mute);border-style:dotted}
+  .sw.fl{background:var(--red-bg);border-color:var(--red)}
+
+  /* ── 섹션 골격 ─────────────────────────── */
+  section{display:grid;grid-template-columns:96px 1fr;gap:28px;padding:56px 0 8px;border-bottom:1.5px solid var(--line)}
+  .sec-no{font-family:var(--mono);font-size:42px;font-weight:600;color:transparent;-webkit-text-stroke:1.3px var(--ink);line-height:1;position:sticky;top:24px;height:min-content}
+  .sec-body{min-width:0}
+  h2{font-size:24px;font-weight:700;letter-spacing:-0.01em;margin-bottom:6px}
+  .sec-cap{font-size:14px;color:var(--mute);margin-bottom:26px;max-width:760px}
+  h3{font-size:16.5px;font-weight:700;margin:34px 0 12px;display:flex;align-items:center;gap:9px}
+  h3 .tick{width:9px;height:9px;background:var(--cobalt);display:inline-block;border-radius:2px;flex:none}
+
+  /* ── 노선도 SVG ───────────────────────── */
+  .map-frame{background:var(--card);border:1.5px solid var(--ink);padding:18px 10px 8px;overflow-x:auto}
+  .map-frame svg{display:block;min-width:1080px;width:100%;height:auto}
+  .map-note{font-size:12.5px;color:var(--mute);margin-top:10px;font-family:var(--mono)}
+
+  /* ── 카드 ─────────────────────────────── */
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}
+  @media(max-width:900px){.grid2,.grid3{grid-template-columns:1fr}section{grid-template-columns:1fr}.sec-no{position:static}}
+  .card{background:var(--card);border:1.5px solid var(--ink);padding:18px 20px 16px;position:relative}
+  .card.span2{grid-column:1/-1}
+  .stage-head{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:4px}
+  .stage-id{font-family:var(--mono);font-weight:600;font-size:20px}
+  .stage-name{font-size:16.5px;font-weight:700}
+  .phase{font-family:var(--mono);font-size:11.5px;background:var(--ink);color:var(--paper);padding:2.5px 9px;border-radius:99px;letter-spacing:.04em}
+  .vtag{font-family:var(--mono);font-size:10.5px;border:1.2px solid var(--cobalt);color:var(--cobalt);padding:1.5px 7px;border-radius:99px;letter-spacing:.06em}
+  .vtag.t{border-color:var(--teal);color:var(--teal)}
+  .actor-row{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 12px}
+  .actor{font-family:var(--mono);font-size:11.5px;padding:2.5px 9px;border-radius:4px;border:1.2px solid}
+  .actor.main{color:var(--cobalt);border-color:var(--cobalt);background:var(--cobalt-bg)}
+  .actor.sub{color:var(--indigo);border-color:var(--indigo);background:var(--indigo-bg)}
+  .actor.cdx{color:var(--teal);border-color:var(--teal);background:var(--teal-bg);border-style:dashed}
+  .actor.hum{color:var(--amber);border-color:var(--amber);background:var(--amber-bg)}
+  .card ul{list-style:none;font-size:13.8px}
+  .card ul li{padding:5px 0 5px 16px;position:relative;border-top:1px solid var(--hair)}
+  .card ul li:first-child{border-top:none}
+  .card ul li::before{content:"";position:absolute;left:2px;top:13px;width:6px;height:6px;border:1.4px solid var(--ink);border-width:1.4px 1.4px 0 0;transform:rotate(45deg)}
+  .card ul li b{font-weight:700}
+  .rec{margin-top:12px;padding-top:9px;border-top:1.5px dashed var(--line);font-family:var(--mono);font-size:11.8px;color:var(--mute);word-break:break-all}
+  .rec b{color:var(--ink);font-weight:600}
+
+  code,.mono-inline{font-family:var(--mono);font-size:.92em;background:#EFECE2;padding:1px 5px;border-radius:3px}
+  .gate-card{border-color:var(--amber);background:linear-gradient(var(--amber-bg),var(--card) 130px)}
+  .gate-card .stage-id{color:var(--amber)}
+  .gate-card ul li::before{border-color:var(--amber)}
+
+  /* ── 칩 플로우 ─────────────────────────── */
+  .flow{display:flex;flex-wrap:wrap;align-items:center;gap:7px;margin:10px 0 4px}
+  .st{font-family:var(--mono);font-size:12.5px;border:1.5px solid var(--ink);background:#fff;padding:5px 11px;border-radius:6px;white-space:nowrap}
+  .st small{display:block;font-size:10px;color:var(--mute);line-height:1.3;white-space:normal}
+  .ar{color:var(--mute);font-size:13px;font-family:var(--mono);flex:none}
+  .ar.lp{color:var(--red)}
+  .st.gate{border-color:var(--amber);background:var(--amber-bg);color:#7C3D08}
+  .st.gate::before{content:"◆ ";font-size:10px}
+  .st.fail{border-color:var(--red);background:var(--red-bg);color:var(--red)}
+  .st.pass{border-color:var(--green);background:var(--green-bg);color:var(--green)}
+  .st.cdx{border-color:var(--teal);border-style:dashed;background:var(--teal-bg);color:var(--teal)}
+  .st.sub{border-color:var(--indigo);background:var(--indigo-bg);color:var(--indigo)}
+  .st.user{background:var(--amber);border-color:var(--amber);color:#fff}
+  .st.term{background:var(--ink);border-color:var(--ink);color:var(--paper)}
+  .st.hook{border-style:dotted;border-color:var(--mute);background:#EFEDE6;color:var(--mute)}
+  .st.dim{border-style:dashed;border-color:var(--mute);color:var(--mute);background:transparent}
+
+  /* ── 케이스 블록 ───────────────────────── */
+  .case{background:var(--card);border:1.5px solid var(--ink);margin-bottom:18px}
+  .case-head{display:flex;align-items:center;gap:14px;padding:13px 20px;border-bottom:1.5px solid var(--ink);flex-wrap:wrap}
+  .case-id{font-family:var(--mono);font-weight:600;font-size:15px;background:var(--ink);color:var(--paper);width:34px;height:34px;display:flex;align-items:center;justify-content:center;border-radius:6px;flex:none}
+  .case-title{font-weight:700;font-size:16px}
+  .case-cond{font-size:12.5px;color:var(--mute);font-family:var(--mono);margin-left:auto}
+  .case-body{padding:14px 20px 16px}
+  .case-note{font-size:13.2px;color:#3E3A30;margin-top:10px;padding-left:14px;border-left:3px solid var(--line)}
+  .case-note b{font-weight:700}
+  .branch-label{font-family:var(--mono);font-size:11.5px;color:var(--mute);margin:12px 0 2px;letter-spacing:.05em}
+
+  /* ── 표 ───────────────────────────────── */
+  table{width:100%;border-collapse:collapse;background:var(--card);border:1.5px solid var(--ink);font-size:13.3px}
+  th{font-family:var(--mono);font-size:11px;letter-spacing:.09em;text-transform:uppercase;font-weight:600;text-align:left;padding:9px 14px;border-bottom:1.5px solid var(--ink);background:#EFECE2}
+  td{padding:9px 14px;border-bottom:1px solid var(--hair);vertical-align:top}
+  tr:last-child td{border-bottom:none}
+  td.c{font-family:var(--mono);font-size:12.3px}
+  .ok{color:var(--green);font-weight:700}
+  .no{color:var(--red);font-weight:700}
+  .tealtxt{color:var(--teal);font-weight:700}
+
+  pre{background:#211E17;color:#EFEAD9;font-family:var(--mono);font-size:12.6px;line-height:1.75;padding:18px 20px;overflow-x:auto;border-radius:4px;border:1.5px solid var(--ink)}
+  pre .cm{color:#9A917C}
+  pre .k{color:#8FB7FF}
+  pre .s{color:#A8D9B5}
+
+  footer{margin-top:64px;padding-top:24px;border-top:3px solid var(--ink);font-size:12.5px;color:var(--mute);font-family:var(--mono);line-height:2}
+  @media print{body{background:none}.wrap{max-width:none;padding:0 8mm}section{break-inside:avoid-page}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<!-- ════════════ 헤더 ════════════ -->
+<header>
+  <div class="doc-no">W.A.Y? · SKILLS/07_ORCHESTRATION · PROCESS SCHEMATIC</div>
+  <h1><span class="mono">full-loop</span> v1.4.0 프로세스 도해</h1>
+  <p class="subtitle">자연어 지시 1건 → 8단계 자동 진행 루프 — 단계·게이트·검수 체계·케이스별 경로의 전체 지도</p>
+  <div class="meta-grid">
+    <div class="meta-cell"><b>정본</b><span>skills/07_orchestration/full-loop/SKILL.md</span></div>
+    <div class="meta-cell"><b>버전</b><span>1.4.0 (2026-06-13 게이트 2 재설계)</span></div>
+    <div class="meta-cell"><b>단계</b><span>S1–S8</span></div>
+    <div class="meta-cell"><b>인간 게이트</b><span>3곳 (절대 우회 금지)</span></div>
+    <div class="meta-cell"><b>검수자</b><span>Claude×2 + GPT-5.5×1</span></div>
+    <div class="meta-cell"><b>재시도 한도</b><span>3회</span></div>
+  </div>
+  <div class="legend">
+    <span class="lg"><span class="sw main"></span>메인 세션 (Claude)</span>
+    <span class="lg"><span class="sw sub"></span>서브에이전트 (Claude opus·fable)</span>
+    <span class="lg"><span class="sw cdx"></span>codex CLI (GPT-5.5 · read-only)</span>
+    <span class="lg"><span class="sw hum"></span>인간 게이트 (운영자)</span>
+    <span class="lg"><span class="sw hk"></span>Stop 훅 드라이버</span>
+    <span class="lg"><span class="sw fl"></span>FAIL · 재실행 경로</span>
+  </div>
+</header>
+
+<!-- ════════════ 01 노선도 ════════════ -->
+<section id="map">
+  <div class="sec-no">01</div>
+  <div class="sec-body">
+    <h2>전체 노선도</h2>
+    <p class="sec-cap">본선(S1→S8)을 따라 진행하며, 마름모(◆)는 인간 게이트입니다 — G1·G3은 루프가 스스로 통과할 수 없는 정지점, G2는 v1.4부터 3단 처리(위임 실행 / 큐 적재 후 속행 / 선행 조건일 때만 정지)로 야간 무인을 유지합니다. 붉은 지선은 검수 FAIL 시 재실행 루프(최대 3시도), 점선 위 우회로는 조건부 시장조사, 청록 점선은 codex(GPT-5.5) 이종 검수 접점입니다.</p>
+
+    <div class="map-frame">
+    <svg viewBox="0 0 1140 392" xmlns="http://www.w3.org/2000/svg" font-family="IBM Plex Mono, SF Mono, Menlo, monospace">
+      <!-- 드라이버 훅 레일 -->
+      <line x1="40" y1="352" x2="1100" y2="352" stroke="#6E675B" stroke-width="1.6" stroke-dasharray="2 5"/>
+      <text x="40" y="374" font-size="11" fill="#6E675B">Stop 훅 full-loop-driver.js — 턴이 끊기면 state를 읽어 다음 단계 재점화 · phase당 차단 ≤2 / 누적 ≤12 → stalled · awaiting_* 게이트에서는 개입하지 않음</text>
+      <!-- 훅 재점화 화살표 (본선으로) -->
+      <g stroke="#6E675B" stroke-width="1.3" stroke-dasharray="2 4">
+        <line x1="180" y1="352" x2="180" y2="172"/><line x1="540" y1="352" x2="540" y2="172"/><line x1="900" y1="352" x2="900" y2="172"/>
+      </g>
+
+      <!-- S2 조건부 우회로 -->
+      <path d="M 76 150 C 110 84, 180 72, 218 72 C 256 72, 320 84, 352 144" fill="none" stroke="#1C1914" stroke-width="2.4" stroke-dasharray="7 5"/>
+      <text x="218" y="48" font-size="11.5" text-anchor="middle" fill="#1C1914">조건부 — 외부 사실(시장·법령·통계) 필요 시</text>
+      <circle cx="218" cy="72" r="13" fill="#FDFCF8" stroke="#1C1914" stroke-width="2.6"/>
+      <text x="218" y="76.5" font-size="11.5" font-weight="600" text-anchor="middle">S2</text>
+      <text x="218" y="100" font-size="11" text-anchor="middle" fill="#6E675B">research</text>
+
+      <!-- 본선 -->
+      <line x1="70" y1="150" x2="1010" y2="150" stroke="#1A45C2" stroke-width="3"/>
+      <text x="190" y="141" font-size="10.5" fill="#6E675B" text-anchor="middle">skip 시 s2.skipped_reason</text>
+
+      <!-- 게이트1 거부 회귀 (아래) -->
+      <path d="M 522 150 L 522 192 L 358 192 L 358 162" fill="none" stroke="#B45309" stroke-width="1.8" stroke-dasharray="5 4"/>
+      <text x="440" y="206" font-size="10.5" fill="#B45309" text-anchor="middle">거부·수정 지시 → S3 회귀 (plan)</text>
+
+      <!-- S7 재실행 루프 -->
+      <path d="M 806 150 L 806 232 L 656 232 L 656 162" fill="none" stroke="#B3261E" stroke-width="2.6"/>
+      <polygon points="656,158 651,170 661,170" fill="#B3261E"/>
+      <text x="731" y="213" font-size="11" fill="#B3261E" text-anchor="middle">FAIL → S7</text>
+      <text x="731" y="227" font-size="10.5" fill="#B3261E" text-anchor="middle">차분 피드백 · iter&lt;3</text>
+      <!-- 게이트3 분기 -->
+      <path d="M 760 232 L 760 290" fill="none" stroke="#B45309" stroke-width="1.8"/>
+      <rect x="751" y="249" width="18" height="18" transform="rotate(45 760 258)" fill="#FBF3E4" stroke="#B45309" stroke-width="2.2"/>
+      <text x="782" y="262" font-size="10.5" fill="#B45309">G3 한도 소진(3회)</text>
+      <rect x="689" y="292" width="142" height="26" rx="4" fill="#B45309"/>
+      <text x="760" y="309" font-size="10.5" fill="#fff" text-anchor="middle">awaiting_user · 3택 보고</text>
+
+      <!-- 게이트2 분기 -->
+      <path d="M 575 150 L 575 290" fill="none" stroke="#B45309" stroke-width="1.8"/>
+      <rect x="566" y="196" width="18" height="18" transform="rotate(45 575 205)" fill="#FBF3E4" stroke="#B45309" stroke-width="2.2"/>
+      <text x="575" y="238" font-size="10.5" fill="#B45309" text-anchor="middle">G2 외부 영향</text>
+      <rect x="468" y="292" width="214" height="26" rx="4" fill="#FBF3E4" stroke="#B45309" stroke-width="1.8"/>
+      <text x="575" y="309" font-size="10.5" fill="#7C3D08" text-anchor="middle">위임=실행 · 미위임=큐 적재 후 속행</text>
+      <text x="575" y="332" font-size="9.5" fill="#B45309" text-anchor="middle">선행 조건일 때만 awaiting_user 정지 (v1.4)</text>
+
+      <!-- codex 접점 -->
+      <g stroke="#0E8074" stroke-width="1.8" stroke-dasharray="4 4" fill="none">
+        <line x1="438" y1="150" x2="438" y2="92"/>
+        <line x1="880" y1="150" x2="880" y2="92"/>
+      </g>
+      <rect x="370" y="64" width="136" height="28" rx="14" fill="#E9F4F2" stroke="#0E8074" stroke-width="1.8" stroke-dasharray="4 3"/>
+      <text x="438" y="82" font-size="11" fill="#0E8074" text-anchor="middle">codex 계획 교차검토</text>
+      <rect x="812" y="64" width="136" height="28" rx="14" fill="#E9F4F2" stroke="#0E8074" stroke-width="1.8" stroke-dasharray="4 3"/>
+      <text x="880" y="82" font-size="11" fill="#0E8074" text-anchor="middle">codex 이종 검수(자문)</text>
+
+      <!-- 역(station) -->
+      <g>
+        <circle cx="70"  cy="150" r="13" fill="#FDFCF8" stroke="#1A45C2" stroke-width="2.8"/><text x="70"  y="154.5" font-size="11.5" font-weight="600" text-anchor="middle">S1</text>
+        <text x="70" y="124" font-size="11" text-anchor="middle" fill="#1C1914" font-weight="600">구체화</text>
+        <circle cx="358" cy="150" r="13" fill="#FDFCF8" stroke="#1A45C2" stroke-width="2.8"/><text x="358" y="154.5" font-size="11.5" font-weight="600" text-anchor="middle">S3</text>
+        <text x="358" y="124" font-size="11" text-anchor="middle" fill="#1C1914" font-weight="600">계획(플랜모드)</text>
+        <circle cx="438" cy="150" r="13" fill="#FDFCF8" stroke="#1A45C2" stroke-width="2.8"/><text x="438" y="154.5" font-size="11.5" font-weight="600" text-anchor="middle">S4</text>
+        <text x="438" y="124" font-size="11" text-anchor="middle" fill="#1C1914" font-weight="600">검토 3단</text>
+        <!-- G1 -->
+        <rect x="513" y="141" width="18" height="18" transform="rotate(45 522 150)" fill="#FBF3E4" stroke="#B45309" stroke-width="2.4"/>
+        <text x="522" y="124" font-size="11" text-anchor="middle" fill="#B45309" font-weight="600">G1 계획 승인</text>
+        <text x="522" y="172" font-size="10" text-anchor="middle" fill="#B45309">ExitPlanMode</text>
+        <circle cx="656" cy="150" r="13" fill="#FDFCF8" stroke="#1A45C2" stroke-width="2.8"/><text x="656" y="154.5" font-size="11.5" font-weight="600" text-anchor="middle">S5</text>
+        <text x="656" y="124" font-size="11" text-anchor="middle" fill="#1C1914" font-weight="600">실행 opus·xhigh</text>
+        <circle cx="806" cy="150" r="13" fill="#FDFCF8" stroke="#1A45C2" stroke-width="2.8"/><text x="806" y="154.5" font-size="11.5" font-weight="600" text-anchor="middle">S6</text>
+        <text x="806" y="124" font-size="11" text-anchor="middle" fill="#1C1914" font-weight="600">검수 3종</text>
+        <circle cx="952" cy="150" r="13" fill="#FDFCF8" stroke="#1A45C2" stroke-width="2.8"/><text x="952" y="154.5" font-size="11.5" font-weight="600" text-anchor="middle">S8</text>
+        <text x="952" y="124" font-size="11" text-anchor="middle" fill="#1C1914" font-weight="600">지식 적재(강제)</text>
+        <text x="879" y="141" font-size="10.5" fill="#1A7A3C" text-anchor="middle" font-weight="600">전원 PASS</text>
+        <!-- done -->
+        <rect x="998" y="138" width="48" height="24" rx="3" fill="#1C1914"/>
+        <text x="1022" y="154.5" font-size="11" fill="#F5F2EA" text-anchor="middle" font-weight="600">done</text>
+        <text x="1022" y="178" font-size="10" fill="#6E675B" text-anchor="middle">state 삭제</text>
+      </g>
+    </svg>
+    </div>
+    <p class="map-note">읽는 법 — 본선: phase 전이(state 파일 즉시 갱신) / ◆: 인간만 통과시킬 수 있는 역 / 붉은 지선: 최대 3바퀴 / 점선 레일(하단): 턴이 끊겨도 훅이 본선으로 되돌려 놓음</p>
+  </div>
+</section>
+
+<!-- ════════════ 02 단계 상세 ════════════ -->
+<section id="stages">
+  <div class="sec-no">02</div>
+  <div class="sec-body">
+    <h2>8단계 상세</h2>
+    <p class="sec-cap">각 단계는 전이 시마다 state 파일(<code>.claude/full-loop-state.local.json</code>)에 기록을 남깁니다 — 컴팩션·세션 끊김에도 기록만으로 재개 가능합니다.</p>
+
+    <div class="grid2">
+      <div class="card">
+        <div class="stage-head"><span class="stage-id">S1</span><span class="stage-name">프롬프트 구체화</span><span class="phase">refine</span></div>
+        <div class="actor-row"><span class="actor main">메인 세션</span></div>
+        <ul>
+          <li>지시를 <b>task-brief</b>로 구조화 — 목표 / 범위·경계 / 제약 / 대상 레포 / 산출물 / Critical 4기준</li>
+          <li><b>인텐트 9종 분류</b> <span class="vtag">v1.2</span> — trivial(질문 0)·simple(1~2)·refactor·build-from-scratch·research·spec-driven·test-infra·architecture·collaboration. 패밀리별 질문 예산 차등</li>
+          <li><b>과분류 방지 가드</b> — 10단어 미만·모호 동사("개선"·"디벨롭")만 있으면 simple 기본. build-from-scratch는 명시 신호 필수</li>
+          <li><b>모호성 5차원 채점</b> <span class="vtag">v1.2</span> — goal 0.40 · constraints 0.30 · criteria 0.30 (brownfield는 +context 0.15 재배분). <b>ambiguity ≤ 0.3</b> 될 때까지 표적 질문(전체 상한 2~3개)</li>
+          <li><b>codex 검수 게이팅</b> <span class="vtag t">v1.3</span> — 기본 ON. 민감 데이터(개인정보·운영 수치·실명·git 격리 폴더) 포함 시 <b>자동 OFF + 1줄 고지</b> (P6: codex 호출 = OpenAI 전송). 사용자 1줄 override 가능</li>
+        </ul>
+        <div class="rec"><b>기록</b> s1{brief, critical_path, ambiguity, intent, codex_review} → research 또는 plan</div>
+      </div>
+
+      <div class="card">
+        <div class="stage-head"><span class="stage-id">S2</span><span class="stage-name">시장조사 — 조건부</span><span class="phase">research</span></div>
+        <div class="actor-row"><span class="actor main">메인 세션</span><span class="actor sub">research-analyst 팬아웃</span></div>
+        <ul>
+          <li><b>진입 조건</b>: 답에 외부 사실(시장·가격·경쟁·법령·통계)이 필요할 때만. 순수 코드·창작은 skip + 사유 기록</li>
+          <li><b>라우팅 우선순위</b>: (1) 한국 공공데이터 → 06 스킬 4종 <b>의무</b> (2) 시장 구조 → market-intelligence (3) 다출처 교차검증 → /deep-research (4) 차단 소스 → /insane-search <span style="opacity:.65">(업스트림: fivetaku, MIT 라이선스)</span> (5) 광범위 병렬 → research-analyst·Workflow</li>
+          <li>플러그인 부재 시 WebSearch <b>강등 명시</b> — [PARTIAL] + degraded=true (무음 강등 금지)</li>
+          <li>SVOP: 모든 사실에 출처 마커, 실패는 5모드 보고</li>
+        </ul>
+        <div class="rec"><b>기록</b> s2{route, sources[], notes_path} 또는 s2{skipped_reason}</div>
+      </div>
+
+      <div class="card">
+        <div class="stage-head"><span class="stage-id">S3</span><span class="stage-name">계획 작성</span><span class="phase">plan</span></div>
+        <div class="actor-row"><span class="actor main">메인 세션 (플랜모드)</span><span class="actor sub">loop-planner (fable·max)</span></div>
+        <ul>
+          <li><b>EnterPlanMode 강제 진입</b>. 메인 세션이 최고 모델이 아니면 loop-planner에 초안 위임</li>
+          <li><b>자원 활용 계획 의무</b> <span class="vtag">v1.1</span> — 4계층(스킬 131종 · 에이전트 14종 · 플러그인 · 내장 오케스트레이션) 전수 검토 후 "단계 × 자원 × 사유" 표 작성. <b>표 없으면 S4 진입 불가</b></li>
+          <li><b>AC 체크리스트 고정</b> — AC-1..n + 항목별 검증 방법(명령·경로·기대 출력). 승인 후 변경 금지(이동 골대 차단)</li>
+          <li><b>외부 영향 사전 위임 목록</b> <span class="vtag">v1.4</span> — 예상 외부 영향(push 등)을 pre_approved_external 후보로 계획에 명시, 게이트 1에서 한 번에 승인(야간 정지 설계 제거)</li>
+        </ul>
+        <div class="rec"><b>기록</b> s3{plan_path, ac_count, resource_plan} + completion_criteria에 AC 복사</div>
+      </div>
+
+      <div class="card">
+        <div class="stage-head"><span class="stage-id">S4</span><span class="stage-name">계획 검토 3단 + 승인</span><span class="phase">plan → awaiting_plan_approval</span></div>
+        <div class="actor-row"><span class="actor main">plan-reviewer</span><span class="actor sub">loop-critic (fable)</span><span class="actor cdx">codex GPT-5.5</span><span class="actor hum">게이트 1</span></div>
+        <ul>
+          <li><b>(1) 자가검토</b> — plan-reviewer 5관점을 계획에 append</li>
+          <li><b>(2) loop-critic 독립 비평</b> <span class="vtag">v1.2</span> — OKAY/REJECT 이분 + 4축. REJECT → top 3~5 개선안으로 차분 수정 후 재비평 <b>최대 2회</b>, 그래도 REJECT면 awaiting_user. Critical 과제는 deliberate 모드(pre-mortem)</li>
+          <li><b>(3) codex 교차검토</b> <span class="vtag t">v1.3</span> — critic OKAY 후 1회. read-only·ephemeral·gpt-5.5로 결함·공백·과소추정·리스크만 지적(스타일 평가 금지) → 계획서 "교차검토(GPT-5.5)" 절 append. 실패 시 fail-open</li>
+          <li><b>게이트 1</b>: ExitPlanMode — 인간이 자가검토·critic·GPT 의견을 <b>모두 보고</b> 승인/거부(거부 시 S3 회귀). <b>외부 영향 위임 목록도 함께 승인</b> <span class="vtag">v1.4</span></li>
+        </ul>
+        <div class="rec"><b>기록</b> s4{approved_at, critic_verdict, critic_rounds, codex}</div>
+      </div>
+
+      <div class="card">
+        <div class="stage-head"><span class="stage-id">S5</span><span class="stage-name">실행</span><span class="phase">execute</span></div>
+        <div class="actor-row"><span class="actor sub">loop-executor (opus·xhigh)</span><span class="actor hum">게이트 2 (조건부)</span></div>
+        <ul>
+          <li>loop-executor 호출 — 산출물 경로 + <code>MODEL_USED</code> <b>자기 증명</b> 회수. 대규모 병렬은 Workflow 팬아웃(opus)</li>
+          <li>파일 변경은 worktree 격리 규칙 준수(백그라운드 세션)</li>
+          <li><b>게이트 2 — 3단 처리</b> <span class="vtag">v1.4</span>: (1) 위임됨 → 즉시 실행+로그 (2) 미위임·비선행 → <b>큐 적재 후 루프 속행</b> (3) 미위임·선행 조건 → awaiting_user 정지. 자동 실행 금지 원칙 불변(14절 1순위)</li>
+          <li><b>훅 강제</b> <span class="vtag">v1.4</span>: PreToolUse <code>external-impact-guard.js</code>가 루프 활성 중 push·발송류를 <b>도구 레벨 차단</b>(서브에이전트 포함) — 자진 신고 의존 해소. fail-open</li>
+        </ul>
+        <div class="rec"><b>기록</b> s5{attempt_n, model_used, artifacts[]}</div>
+      </div>
+
+      <div class="card">
+        <div class="stage-head"><span class="stage-id">S6</span><span class="stage-name">검수 — 3종 병렬</span><span class="phase">review</span></div>
+        <div class="actor-row"><span class="actor sub">loop-reviewer-spec</span><span class="actor sub">loop-reviewer-verify</span><span class="actor cdx">codex (자문)</span></div>
+        <ul>
+          <li>전원 <b>산출 컨텍스트 미공유</b> — AC + 산출물 경로만 전달 (스타일 편향 통제)</li>
+          <li><b>tier 라우팅</b> <span class="vtag">v1.2</span>: 비Critical 소형 → tier-light(각 1기) / 그 외 → tier-full(+무결성 1기 가능). codex는 tier 무관 병설</li>
+          <li><b>판정</b>: PARTIAL=FAIL. <b>차단권은 Claude 2종</b> — 전원 전 항목 PASS만 합격. codex FAIL은 비차단(자문) — 단 <b>blocker 입증 시 예외 차단</b> <span class="vtag t">v1.3</span></li>
+          <li>codex 실패 → <b>fail-open</b>: Claude만으로 속행 + TOOL_FAILED 기록</li>
+          <li><b>Critical N=3 불변</b>: Claude×2 + codex×1 이종 구성으로 충족. 분산 시 보류 + pending 등록</li>
+          <li>일치율 계측 → meta-feedback.log (동등 투표권 승격 결재의 데이터)</li>
+        </ul>
+        <div class="rec"><b>기록</b> s6{tier, verdicts[], fail_acs[], bon, codex{verdict_path, agreement, blocker_found}}</div>
+      </div>
+
+      <div class="card">
+        <div class="stage-head"><span class="stage-id">S7</span><span class="stage-name">재실행</span><span class="phase">review → execute</span></div>
+        <div class="actor-row"><span class="actor main">메인 세션</span><span class="actor sub">loop-executor 재호출</span><span class="actor hum">게이트 3 (한도 시)</span></div>
+        <ul>
+          <li>조건: FAIL 존재 ∧ iteration &lt; 3 → iteration++ 후 S5 재호출</li>
+          <li><b>차분 피드백만</b> 주입 — {AC-ID, 검수자(claude-spec|claude-verify|codex), 증거, 기대 vs 실제, 수정지시 1줄}. 전체 재작업 금지 <span class="vtag t">v1.3 검수자 출처 표기</span></li>
+          <li><b>게이트 3</b>: 한도 소진 → 미해결 AC + 시도별 원인 + 5모드 분포 + 3택(부분 수용/중단/직접 지시) 보고. <b>성공 위장 절대 금지</b></li>
+        </ul>
+        <div class="rec"><b>기록</b> iteration, review.verdicts 누적</div>
+      </div>
+
+      <div class="card">
+        <div class="stage-head"><span class="stage-id">S8</span><span class="stage-name">지식 적재 — 강제</span><span class="phase">deposit</span></div>
+        <div class="actor-row"><span class="actor main">메인 세션</span><span class="actor hk" style="font-family:var(--mono);font-size:11.5px;padding:2.5px 9px;border-radius:4px;border:1.2px dotted var(--mute);color:var(--mute);background:#EFEDE6">훅이 done 차단</span></div>
+        <ul>
+          <li>합격이든 한도 보고든 <b>반드시 수행</b> — 훅이 knowledge_deposited=true 전까지 done 전이 차단</li>
+          <li>적재 분류·매핑·[UNCERTAIN] 규칙은 <b>remember 스킬이 SSOT</b> <span class="vtag">v1.2</span></li>
+          <li>산출물 → 프로젝트 레포 knowledge/ 또는 하네스 _reference/ (<b>P6: 운영 수치·실명 토큰화</b>) · 교훈 → auto-memory + MEMORY.md · 이벤트 → operations.log + meta-feedback.log 각 1줄</li>
+          <li>memory/ 3-tier 직접 쓰기 금지 — 승격 후보는 pending.md 결재 등록만</li>
+          <li>grep으로 로그 재확인 → <b>큐 정산</b> <span class="vtag">v1.4</span>: 큐 비면 done·state 삭제 / 큐 잔존 시 awaiting_user 종료 — 최종 보고에 큐+의존 AC 일괄 제시, 사용자 결정 후 done</li>
+        </ul>
+        <div class="rec"><b>기록</b> knowledge_deposited=true, deposited_refs[]</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════ 03 인간 게이트 ════════════ -->
+<section id="gates">
+  <div class="sec-no">03</div>
+  <div class="sec-body">
+    <h2>인간 게이트 3곳 — 절대 우회 금지</h2>
+    <p class="sec-cap">게이트 phase(<code>awaiting_*</code>)에서는 드라이버 훅도 개입하지 않습니다 — 루프는 자연 정지하고, 인간의 다음 발화만이 재개시킵니다. v1.4부터 G2는 기본 비정지(위임·큐) — 정지형 게이트는 G1·G3과 G2의 선행 조건 분기뿐입니다.</p>
+    <div class="grid3">
+      <div class="card gate-card">
+        <div class="stage-head"><span class="stage-id">G1</span><span class="stage-name">계획 승인</span></div>
+        <ul>
+          <li><b>위치</b>: S4 말 — ExitPlanMode 호출 자체가 게이트</li>
+          <li><b>인간이 보는 것</b>: 계획 + 자가검토 5관점 + critic 비평 + GPT-5.5 교차검토</li>
+          <li><b>승인</b> → execute / <b>거부·수정</b> → plan 회귀</li>
+          <li>AC는 승인 시점에 동결 — 이후 변경 금지</li>
+        </ul>
+      </div>
+      <div class="card gate-card">
+        <div class="stage-head"><span class="stage-id">G2</span><span class="stage-name">외부 영향 — 3단 처리</span><span class="vtag">v1.4</span></div>
+        <ul>
+          <li><b>위임됨</b>(게이트 1에서 승인된 pre_approved_external): 즉시 실행 + operations.log 자기 증명</li>
+          <li><b>미위임·비선행</b>: 큐(pending_external_actions) 적재 → <b>루프는 멈추지 않고 속행</b>, S8 후 일괄 결정</li>
+          <li><b>미위임·선행 조건</b>: 그때만 awaiting_user 정지</li>
+          <li><b>훅 강제</b>: PreToolUse가 push·발송류를 도구 레벨 차단 — 규율 아닌 메커니즘. 자동 실행 금지 원칙 불변</li>
+        </ul>
+      </div>
+      <div class="card gate-card">
+        <div class="stage-head"><span class="stage-id">G3</span><span class="stage-name">재시도 한도</span></div>
+        <ul>
+          <li><b>위치</b>: S7 — iteration 3 소진 시</li>
+          <li><b>보고 의무</b>: 미해결 AC 목록 + 시도별 실패 원인 + 5모드 분포</li>
+          <li><b>3택 제시</b>: 부분 수용 / 중단 / 직접 지시</li>
+          <li><b>성공 위장 절대 금지</b> — 정직 보고가 합격보다 우선</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════ 04 검수 체계 ════════════ -->
+<section id="review">
+  <div class="sec-no">04</div>
+  <div class="sec-body">
+    <h2>S6 검수 체계 심화 — 이종 3검수</h2>
+    <p class="sec-cap">v1.3의 핵심: 실행자(Claude)와 같은 모델 계열만으로 검수하면 공유 맹점을 놓칩니다. GPT-5.5가 세 번째 눈으로 들어오되, 파일럿 기간에는 <b>자문 권한</b>으로 제한됩니다.</p>
+
+    <h3><span class="tick"></span>검수자 구성과 권한</h3>
+    <table>
+      <tr><th style="width:24%">검수자</th><th style="width:17%">모델</th><th style="width:24%">방법</th><th style="width:13%">합격 차단권</th><th>비고</th></tr>
+      <tr><td class="c">loop-reviewer-spec</td><td class="c">Claude opus · xhigh</td><td>AC 명세 대조 (READ 기반)</td><td class="ok">있음</td><td>파일:라인 인용 의무, 증거 없는 PASS 금지</td></tr>
+      <tr><td class="c">loop-reviewer-verify</td><td class="c">Claude opus · xhigh</td><td>기능 실증 (BASH 실행·재현)</td><td class="ok">있음</td><td>검증 명령 실제 실행, 실행 불가 시 UNVERIFIABLE</td></tr>
+      <tr><td class="c">codex 이종 검수</td><td class="c tealtxt">GPT-5.5 (codex exec)</td><td>read-only 독립 판정 + verdict JSON</td><td class="no">자문 (예외: blocker)</td><td>FAIL은 S7 피드백 합산 · blocker 재현 입증 시만 차단</td></tr>
+    </table>
+
+    <h3><span class="tick"></span>codex 호출 정형 (read-only 강제)</h3>
+<pre><span class="cm"># 전원 동일 입력: AC 체크리스트 + 산출물 경로 (실행 컨텍스트 미공유)</span>
+codex exec <span class="k">--sandbox</span> read-only <span class="k">--ephemeral</span> <span class="k">-C</span> &lt;작업디렉토리&gt; <span class="k">-m</span> gpt-5.5 \
+  <span class="k">--output-schema</span> <span class="s">skills/07_orchestration/full-loop/codex-verdict.schema.json</span> \
+  <span class="k">-o</span> &lt;세션tmp&gt;/codex-verdict.json <span class="s">"&lt;codex-reviewer-prompt.md 템플릿 + AC·경로 치환&gt;"</span>
+<span class="cm"># verdict JSON은 파일로만 회수 (메인 컨텍스트 원문 적재 금지) · 실패 시 fail-open</span></pre>
+
+    <h3><span class="tick"></span>판정 규칙 — 누가 합격을 결정하나</h3>
+    <table>
+      <tr><th style="width:34%">상황</th><th style="width:18%">판정</th><th>근거 규칙</th></tr>
+      <tr><td>Claude 2종 전 항목 PASS + codex PASS</td><td class="ok">합격 → S8</td><td>전원 일치 — 일치율 로그에 기록</td></tr>
+      <tr><td>Claude 2종 전 항목 PASS + codex FAIL (minor·major)</td><td class="ok">합격 → S8</td><td>codex는 자문 — 비차단. 불일치는 meta-feedback 일치율 데이터로 축적</td></tr>
+      <tr><td>Claude 2종 PASS + codex <b>blocker 입증</b> (재현 증거)</td><td class="no">차단 → S7</td><td>v1.3 예외 조항 — 중대 버그·보안·데이터 손실만</td></tr>
+      <tr><td>Claude 중 1종이라도 FAIL (PARTIAL 포함)</td><td class="no">불합격 → S7</td><td>전 에이전트 전 항목 PASS만 합격 · PARTIAL=FAIL · 판정 불일치 시 FAIL 측 증거 우선</td></tr>
+      <tr><td>codex 호출 실패 (타임아웃·인증·크래시)</td><td class="ok">Claude 2종만으로 판정 속행</td><td>fail-open + s6.codex=TOOL_FAILED 정직 기록 — 외부 도구 장애가 루프를 멈출 수 없음</td></tr>
+    </table>
+
+    <h3><span class="tick"></span>검수 강도 라우팅 (tier × Critical)</h3>
+    <table>
+      <tr><th style="width:22%">조건</th><th style="width:26%">Claude 구성</th><th style="width:22%">codex</th><th>비고</th></tr>
+      <tr><td class="c">tier-light<br><span style="color:var(--mute);font-size:11px">비Critical + 소형(1~2파일)</span></td><td>spec 1기 + verify 1기</td><td class="tealtxt">병설 (자문)</td><td>2종 병렬은 유지 — 축소 금지선</td></tr>
+      <tr><td class="c">tier-full<br><span style="color:var(--mute);font-size:11px">그 외 전부</span></td><td>spec + verify (+ 무결성 전담 1기 가능)</td><td class="tealtxt">병설 (자문)</td><td>대형·복합 산출물</td></tr>
+      <tr><td class="c">critical_path=true</td><td><b>Best-of-N N=3 불변</b> — Claude×2</td><td class="tealtxt"><b>+ codex×1 = 이종 N=3</b></td><td>tier-light 강등 금지 · codex 실패 시 Claude 3종 폴백 · 분산 → 보류 + pending 등록</td></tr>
+    </table>
+  </div>
+</section>
+
+<!-- ════════════ 05 케이스 시나리오 ════════════ -->
+<section id="cases">
+  <div class="sec-no">05</div>
+  <div class="sec-body">
+    <h2>케이스별 경로</h2>
+    <p class="sec-cap">실제 루프가 밟을 수 있는 8가지 대표 경로입니다. 칩의 색이 행위 주체를 나타냅니다 — 범례는 문서 상단과 동일합니다.</p>
+
+    <div class="case">
+      <div class="case-head"><span class="case-id">A</span><span class="case-title">표준 합격 — 시도 1에 끝나는 해피 패스</span><span class="case-cond">조건: 명세형 지시 · 검수 전원 PASS</span></div>
+      <div class="case-body">
+        <div class="flow">
+          <span class="st">S1 구체화<small>패스스루 (질문 0~2)</small></span><span class="ar">→</span>
+          <span class="st dim">S2 skip<small>외부 사실 불요</small></span><span class="ar">→</span>
+          <span class="st">S3 계획+AC 고정</span><span class="ar">→</span>
+          <span class="st sub">S4 critic OKAY</span><span class="ar">→</span>
+          <span class="st cdx">codex 교차검토</span><span class="ar">→</span>
+          <span class="st gate">G1 승인</span><span class="ar">→</span>
+          <span class="st sub">S5 실행 (opus)</span><span class="ar">→</span>
+          <span class="st pass">S6 — 3검수 전원 PASS</span><span class="ar">→</span>
+          <span class="st">S8 적재</span><span class="ar">→</span>
+          <span class="st term">done · state 삭제</span>
+        </div>
+        <p class="case-note">e2e 1회차(프로젝트 예시 디자인)·3회차(하네스 비교 HTML)가 이 경로 — 시도 1, AC 전 항목 PASS.</p>
+      </div>
+    </div>
+
+    <div class="case">
+      <div class="case-head"><span class="case-id">B</span><span class="case-title">검수 FAIL → 차분 재실행 → 합격</span><span class="case-cond">조건: FAIL 존재 ∧ iteration &lt; 3</span></div>
+      <div class="case-body">
+        <div class="flow">
+          <span class="st sub">S5 실행 (시도 1)</span><span class="ar">→</span>
+          <span class="st fail">S6 — AC-3 FAIL<small>spec PASS · verify FAIL · codex FAIL</small></span><span class="ar lp">→</span>
+          <span class="st fail">S7 차분 피드백<small>{AC-3, 검수자, 증거, 기대vs실제, 수정지시}</small></span><span class="ar lp">→</span>
+          <span class="st sub">S5 재실행 (시도 2)<small>FAIL 항목만 수정 — 전체 재작업 금지</small></span><span class="ar">→</span>
+          <span class="st pass">S6 재검수 — 전원 PASS</span><span class="ar">→</span>
+          <span class="st">S8</span><span class="ar">→</span>
+          <span class="st term">done</span>
+        </div>
+        <p class="case-note">codex가 발견한 FAIL도 <b>검수자 출처 표기</b>로 같은 피드백에 합산됩니다(v1.3) — executor는 어느 검수자가 무엇을 지적했는지 보고 수정합니다. e2e 2회차가 이 경로(픽셀 검수가 캡처 결함 적발 → 시도 2 합격).</p>
+      </div>
+    </div>
+
+    <div class="case">
+      <div class="case-head"><span class="case-id">C</span><span class="case-title">한도 소진 — 게이트 3 정직 보고</span><span class="case-cond">조건: 시도 3까지 FAIL 잔존</span></div>
+      <div class="case-body">
+        <div class="flow">
+          <span class="st fail">시도 1 FAIL</span><span class="ar lp">→</span>
+          <span class="st fail">시도 2 FAIL</span><span class="ar lp">→</span>
+          <span class="st fail">시도 3 FAIL</span><span class="ar">→</span>
+          <span class="st gate">G3 한도 소진</span><span class="ar">→</span>
+          <span class="st user">awaiting_user<small>미해결 AC + 시도별 원인 + 5모드 분포</small></span><span class="ar">→</span>
+          <span class="st">3택: 부분 수용 / 중단 / 직접 지시</span>
+        </div>
+        <p class="case-note"><b>성공 위장 절대 금지</b> — 어떤 선택이든 S8 적재(실패 교훈 포함)는 수행됩니다.</p>
+      </div>
+    </div>
+
+    <div class="case">
+      <div class="case-head"><span class="case-id">D</span><span class="case-title">계획이 통과하지 못할 때 — critic REJECT / 인간 거부</span><span class="case-cond">위치: S4</span></div>
+      <div class="case-body">
+        <div class="branch-label">D-1 · loop-critic REJECT (자동 수정 루프)</div>
+        <div class="flow">
+          <span class="st">S3 계획</span><span class="ar">→</span>
+          <span class="st sub">critic REJECT<small>top 3~5 개선안</small></span><span class="ar lp">→</span>
+          <span class="st">계획 차분 수정</span><span class="ar">→</span>
+          <span class="st sub">재비평 (최대 2회)</span><span class="ar">→</span>
+          <span class="st sub">OKAY → 게이트 1로</span><span class="ar">/</span>
+          <span class="st user">2회 후에도 REJECT → awaiting_user</span>
+        </div>
+        <div class="branch-label">D-2 · 게이트 1에서 인간 거부</div>
+        <div class="flow">
+          <span class="st gate">G1 검토<small>자가검토+critic+GPT 의견 열람</small></span><span class="ar">→</span>
+          <span class="st fail">거부·수정 지시</span><span class="ar lp">→</span>
+          <span class="st">S3 회귀 (plan)<small>계획 재작성 후 다시 S4</small></span>
+        </div>
+        <p class="case-note">critic 루프는 무한 비평을 막기 위해 <b>2회 상한</b> — 기계끼리 합의 못 하면 인간에게 올립니다.</p>
+      </div>
+    </div>
+
+    <div class="case">
+      <div class="case-head"><span class="case-id">E</span><span class="case-title">외부 영향 — 게이트 2 3단 처리</span><span class="case-cond">위치: S5 실행 중 (v1.4)</span></div>
+      <div class="case-body">
+        <div class="branch-label">E-1 · 위임됨 — 무정지 (게이트 1에서 사전 승인)</div>
+        <div class="flow">
+          <span class="st sub">S5: git push 필요</span><span class="ar">→</span>
+          <span class="st pass">pre_approved_external 매칭<small>훅 통과</small></span><span class="ar">→</span>
+          <span class="st">즉시 실행 + 로그</span><span class="ar">→</span>
+          <span class="st sub">루프 속행</span>
+        </div>
+        <div class="branch-label">E-2 · 미위임 + 비선행 — 큐 적재 후 속행 (v1.4 기본)</div>
+        <div class="flow">
+          <span class="st sub">S5: 발송 필요 감지</span><span class="ar">→</span>
+          <span class="st hook">PreToolUse 훅 차단<small>도구 레벨 deny + stderr 지시</small></span><span class="ar">→</span>
+          <span class="st gate">G2 큐 적재</span><span class="ar">→</span>
+          <span class="st">루프 속행 → S6<small>의존 AC는 UNVERIFIABLE</small></span><span class="ar">→</span>
+          <span class="st user">S8 후 큐 일괄 결정</span>
+        </div>
+        <div class="branch-label">E-3 · 미위임 + 선행 조건 — 그때만 정지</div>
+        <div class="flow">
+          <span class="st sub">push 없인 후속 AC 불가</span><span class="ar">→</span>
+          <span class="st gate">G2</span><span class="ar">→</span>
+          <span class="st user">awaiting_user 정지</span><span class="ar">→</span>
+          <span class="st">승인 → 위임 목록 추가 → 재시도(훅 통과)</span>
+        </div>
+        <p class="case-note">자동 실행 금지 원칙은 불변(14절 1순위) — v1.4가 바꾼 것은 <b>정지 범위</b>(전체→해당 작업만)와 <b>강제 계층</b>(자진 신고 규율→PreToolUse 훅)입니다.</p>
+      </div>
+    </div>
+
+    <div class="case">
+      <div class="case-head"><span class="case-id">F</span><span class="case-title">codex 검수의 4분기</span><span class="case-cond">위치: S6 (v1.3 자문 모드 파일럿)</span></div>
+      <div class="case-body">
+        <div class="branch-label">F-1 · 자문 FAIL — 비차단, 피드백 합산</div>
+        <div class="flow">
+          <span class="st cdx">codex FAIL (minor·major)</span><span class="ar">+</span>
+          <span class="st fail">Claude도 FAIL</span><span class="ar lp">→</span>
+          <span class="st fail">S7 — 양쪽 발견 합산 주입</span>
+        </div>
+        <div class="flow">
+          <span class="st cdx">codex FAIL (minor·major)</span><span class="ar">+</span>
+          <span class="st pass">Claude 전원 PASS</span><span class="ar">→</span>
+          <span class="st pass">합격 → S8<small>불일치는 일치율 로그에만</small></span>
+        </div>
+        <div class="branch-label">F-2 · blocker 예외 — 차단권 발동</div>
+        <div class="flow">
+          <span class="st cdx">codex blocker 입증<small>중대 버그·보안·데이터 손실 + 재현 증거</small></span><span class="ar lp">→</span>
+          <span class="st fail">합격 차단 → S7</span>
+        </div>
+        <div class="branch-label">F-3 · 호출 실패 — fail-open</div>
+        <div class="flow">
+          <span class="st cdx">codex TOOL_FAILED<small>타임아웃·인증·CLI 크래시</small></span><span class="ar">→</span>
+          <span class="st">Claude 2종만으로 검수 속행<small>s6.codex=TOOL_FAILED 정직 기록</small></span>
+        </div>
+        <div class="branch-label">F-4 · 민감 과제 — 처음부터 제외</div>
+        <div class="flow">
+          <span class="st">S1: 민감 데이터 감지<small>개인정보·운영 수치·실명·git 격리 폴더</small></span><span class="ar">→</span>
+          <span class="st dim">codex_review=false + 1줄 고지</span><span class="ar">→</span>
+          <span class="st dim">S4(3)·S6 codex 전 구간 생략<small>P6 — OpenAI 전송 차단</small></span>
+        </div>
+        <p class="case-note">codex 미설치·PATH 부재도 F-4와 동일하게 처리(P4 — 환경이 달라도 루프 자체는 동일 작동). 모든 분기에서 codex vs Claude 판정 일치율이 meta-feedback.log에 쌓입니다 — <b>동등 투표권 승격 거버넌스 결정의 데이터</b>.</p>
+      </div>
+    </div>
+
+    <div class="case">
+      <div class="case-head"><span class="case-id">G</span><span class="case-title">Critical Path — 강화 메커니즘 총동원</span><span class="case-cond">조건: 외부 영향·자동화 연계·복구 비용·명시 "중요" 중 1+</span></div>
+      <div class="case-body">
+        <div class="flow">
+          <span class="st">S1: critical_path=true</span><span class="ar">→</span>
+          <span class="st">강제 Research Mode + 의무 fetch</span><span class="ar">→</span>
+          <span class="st sub">S4 critic deliberate<small>pre-mortem + 확장 테스트 계획</small></span><span class="ar">→</span>
+          <span class="st">S6 — Best-of-N <b>N=3</b><small>Claude×2 + codex×1 이종 구성</small></span>
+        </div>
+        <div class="branch-label">N=3 판정 분포</div>
+        <div class="flow">
+          <span class="st pass">3/3 일치 → 채택 + Citation</span><span class="ar">/</span>
+          <span class="st">2/1 → 채택 + [DISAGREE] 마커</span><span class="ar">/</span>
+          <span class="st user">분산(3 모두 다름) → 보류 + pending.md 등록</span>
+        </div>
+        <p class="case-note">tier-light 강등 금지 — Critical에서 N=3은 <b>불변</b>입니다. codex 실패 시 Claude 3종으로 폴백해 N=3을 유지합니다. 답변 끝 5모드 요약 의무.</p>
+      </div>
+    </div>
+
+    <div class="case">
+      <div class="case-head"><span class="case-id">H</span><span class="case-title">중단·재개 — 훅 한도, 세션 끊김, 수동 탈출</span><span class="case-cond">운영 한계 상황</span></div>
+      <div class="case-body">
+        <div class="branch-label">H-1 · 같은 phase 2회 차단 / 누적 12회 → 정직 정지</div>
+        <div class="flow">
+          <span class="st hook">Stop 훅 차단 k=2 (동일 phase)</span><span class="ar">→</span>
+          <span class="st fail">stalled<small>무한루프 방지 — 수동 개입 보고 + 5모드</small></span>
+        </div>
+        <div class="branch-label">H-2 · 세션 재시작·컴팩션 → state 기반 재개</div>
+        <div class="flow">
+          <span class="st dim">세션 끊김 / 컴팩션</span><span class="ar">→</span>
+          <span class="st">사용자 "루프 재개" 발화</span><span class="ar">→</span>
+          <span class="st hook">state 읽기 → session_id 갱신</span><span class="ar">→</span>
+          <span class="st">해당 phase부터 속행<small>단계 전이 flush 덕분에 무손실</small></span>
+        </div>
+        <div class="branch-label">H-3 · 수동 탈출</div>
+        <div class="flow">
+          <span class="st">사용자 "루프 중지"</span><span class="ar">→</span>
+          <span class="st term">aborted 기록 + state 삭제</span><span class="ar">/</span>
+          <span class="st hook">폴백: rm .claude/full-loop-state.local.json</span>
+        </div>
+        <p class="case-note">state 파일이 손상되면 훅은 무반응(fail-open) — 루프를 억지로 살리지 않고 스킬 재생성 또는 사용자 보고로 넘깁니다. TTL 24h 경과 state는 훅이 무시합니다.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════ 06 드라이버 훅 · 상태 파일 ════════════ -->
+<section id="driver">
+  <div class="sec-no">06</div>
+  <div class="sec-body">
+    <h2>드라이버 훅 &amp; 상태 파일 — 루프가 죽지 않는 이유</h2>
+    <p class="sec-cap">본 스킬이 1차 드라이버(한 턴에서 최대한 연속 진행)이고, Stop 훅 <code>full-loop-driver.js</code>는 안전망입니다 — 턴이 중간에 끊기면 state를 읽어 다음 단계 지시를 재주입합니다.</p>
+
+    <h3><span class="tick"></span>훅 재점화 사이클</h3>
+    <div class="flow">
+      <span class="st">턴 진행 중 단계 전이<small>state 즉시 갱신 (flush)</small></span><span class="ar">→</span>
+      <span class="st dim">턴이 중간에 끊김</span><span class="ar">→</span>
+      <span class="st hook">Stop 훅 발동<small>state.phase + next_instruction 읽기</small></span><span class="ar">→</span>
+      <span class="st hook">차단 + 재주입<small>block_count++ · ledger append</small></span><span class="ar">→</span>
+      <span class="st">다음 단계 속행</span>
+    </div>
+    <div class="flow" style="margin-top:2px">
+      <span class="st gate">awaiting_* 게이트 phase</span><span class="ar">→</span>
+      <span class="st hook">훅 면제 — 개입하지 않음<small>인간 게이트는 훅보다 위</small></span>
+    </div>
+
+    <h3><span class="tick"></span>카운터·신호등 연동</h3>
+    <table>
+      <tr><th style="width:30%">장치</th><th>규칙</th></tr>
+      <tr><td class="c">block_count_in_phase</td><td>phase당 차단 <b>최대 2회</b> — 초과 시 stalled (같은 단계 무한 반복 방지). phase 전이 시 0으로 리셋</td></tr>
+      <tr><td class="c">total_blocks</td><td>누적 <b>12회 상한</b> — 초과 시 stalled로 정직 정지</td></tr>
+      <tr><td class="c">ledger[]</td><td>훅이 차단할 때마다 {ts, event, phase, counters} append — 진행 이력 자기 증명 (모델은 읽기만)</td></tr>
+      <tr><td class="c">신호등 병기 (.ctx-state)</td><td>Yellow → "노이즈 작업 서브에이전트 격리 강화" / Red → "산출 flush 후 /compact 또는 새 세션 재개 권장". <b>Red여도 강제 중단 없음</b>(권고만 — SVOP 정합)</td></tr>
+      <tr><td class="c">게이트 2 훅 (PreToolUse)</td><td>external-impact-guard.js — 루프 활성(state 존재·비종료·TTL 내) 중 push·발송류 Bash를 도구 레벨 deny, 위임 목록만 통과. fail-open + 단위테스트 10/10 (v1.4)</td></tr>
+      <tr><td class="c">컨텍스트 격리 의무</td><td>S2·S5·S6의 노이즈 큰 작업은 서브에이전트/Workflow로 격리, 메인에는 <b>요약 1~2K 토큰만</b> 회수. codex verdict도 파일로만 회수</td></tr>
+    </table>
+
+    <h3><span class="tick"></span>상태 파일 스키마 (.claude/full-loop-state.local.json · schema v2)</h3>
+<pre>{ <span class="k">"schema_version"</span>: 2, <span class="k">"session_id"</span>: <span class="s">"&lt;현 세션&gt;"</span>, <span class="k">"task_digest"</span>: <span class="s">"&lt;P6 익명화 1줄&gt;"</span>,
+  <span class="k">"phase"</span>: <span class="s">"refine | research | plan | awaiting_plan_approval | execute | review | deposit
+           | awaiting_user | done | aborted | stalled"</span>,
+  <span class="k">"next_instruction"</span>: <span class="s">"&lt;훅이 재주입할 다음 단계 지시 — 전이마다 갱신&gt;"</span>,
+  <span class="k">"iteration"</span>: 0, <span class="k">"max_iterations"</span>: 3, <span class="k">"block_count_in_phase"</span>: 0, <span class="k">"total_blocks"</span>: 0,
+  <span class="k">"completion_criteria"</span>: [<span class="s">"AC-1 …"</span>], <span class="k">"review"</span>: {<span class="k">"verdicts"</span>: [], <span class="k">"bon"</span>: null},
+  <span class="k">"critical_path"</span>: false, <span class="k">"codex_review"</span>: true,  <span class="cm">// ← v1.3: 이종 검수 게이트</span>
+  <span class="k">"pre_approved_external"</span>: [],                  <span class="cm">// ← v1.4: 게이트 1 사전 위임 (훅 통과 목록)</span>
+  <span class="k">"pending_external_actions"</span>: [],               <span class="cm">// ← v1.4: 미위임 외부 영향 지연 큐</span>
+  <span class="k">"knowledge_deposited"</span>: false, <span class="k">"deposited_refs"</span>: [],
+  <span class="k">"ledger"</span>: [],                                  <span class="cm">// ← v1.2: 훅 차단 이력 (자기 증명)</span>
+  <span class="k">"s1"</span>: {<span class="k">"ambiguity"</span>: null, <span class="k">"intent"</span>: null}, <span class="k">"s2"</span>: {}, …, <span class="k">"s8"</span>: {},
+  <span class="k">"created_at"</span>: <span class="s">"ISO"</span>, <span class="k">"updated_at"</span>: <span class="s">"ISO"</span>, <span class="k">"ttl_hours"</span>: 24 }</pre>
+    <p class="map-note" style="margin-top:8px">종료(done / stalled / aborted) 시 state 파일은 삭제 — 잔존 시 훅이 TTL(24h)까지 무시. 루프 시작은 파일 생성, 끝은 파일 삭제로 자기 완결.</p>
+  </div>
+</section>
+
+<!-- ════════════ 07 출처 ════════════ -->
+<section id="source" style="border-bottom:none">
+  <div class="sec-no">07</div>
+  <div class="sec-body">
+    <h2>출처·검증</h2>
+    <table>
+      <tr><th style="width:30%">항목</th><th>출처</th></tr>
+      <tr><td>프로세스 정의 전체 (S1~S8·게이트·훅·state)</td><td class="c">[R] skills/07_orchestration/full-loop/SKILL.md v1.4.0 (main — v1.3 합류 + v1.4 게이트 2 재설계, 거버넌스 결정)</td></tr>
+      <tr><td>codex 검수자 편입·자문 모드·전 루프 ON</td><td class="c">[U] 운영자 직접 지시 + AskUserQuestion 확정 (2026-06-13)</td></tr>
+      <tr><td>codex CLI 인터페이스 (exec·read-only·output-schema)</td><td class="c">[B] codex-cli 0.140.0-alpha.2 --help · 스모크 테스트 실호출</td></tr>
+      <tr><td>e2e 사례 (케이스 A·B 비고)</td><td class="c">[M] auto-memory: full-loop-skill-2026-06-10</td></tr>
+      <tr><td>Best-of-N 처리 분포 (케이스 G)</td><td class="c">[R] rules/critical-path.md v1.0 + CLAUDE.md 7절</td></tr>
+    </table>
+  </div>
+</section>
+
+<footer>
+  W.A.Y? · _reference/2026-06-13-full-loop-process-diagram.html · 생성 2026-06-13<br>
+  본 도해는 SKILL.md v1.3.0 정본을 사실 단위로 대조해 작성됨 — 정본 개정 시 본 문서도 갱신 대상. JS 미사용(정적 렌더) · 인쇄 대응.
+</footer>
+
+</div>
+</body>
+</html>

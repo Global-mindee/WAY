@@ -1,0 +1,21 @@
+# logs/operations.log
+# append-only 이벤트 로그 — Blueprint (4) 영역 A 이벤트 6종
+#
+# 형식: [ISO-8601 timestamp] event-type: detail
+#
+# 핵심 이벤트 6종 (append-only, 추가 가능):
+#   - self-definition-critical: 자기 정의 Critical·Notable 변경
+#   - critical-path-enter: Critical Path 작업 진입
+#   - critical-path-bon3: Best-of-N 결과 (3/3 / 2/1 / 분산)
+#   - mcp-conflict: MCP 출처 충돌
+#   - external-impact: 외부 영향 작업 실행 (push·결재·발송 등)
+#   - mode-override: Mode 자동 분류 → 사용자 override
+#   - context-yellow / context-red / context-compact: 세션 컨텍스트 신호등 (상세 logs/context-usage.local.log)
+#
+# 본 로그는 Blueprint (4) 영역 D 메타 피드백 임계치 분석의 입력입니다.
+# 운영 데이터(실명·수치·기업명)는 적재 금지 — 메타 정보만 (P6 단방향 격리).
+
+# (가상 예시 — 온보딩 후 실제 이벤트로 대체됩니다)
+# [YYYY-MM-DDThh:mm:ssZ] critical-path-enter: 외부 영향 작업 진입 (사유: git push — 외부 영향·되돌리기 비용)
+# [YYYY-MM-DDThh:mm:ssZ] critical-path-bon3: Best-of-N=3 결과 = 3/3 일치 → 답변 채택 + Citation
+# [YYYY-MM-DDThh:mm:ssZ] external-impact: 사용자 명시 승인 후 push 실행 [B: git push]

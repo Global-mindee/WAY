@@ -1,0 +1,31 @@
+# logs/meta-feedback.log
+# append-only P6 메타 피드백 로그 — Blueprint (4) 영역 D
+#
+# 형식: [ISO-8601 timestamp] [출처태그] 내용
+#
+# 출처 태그 4종 (복수 부착 가능):
+#   - [작동 관찰]    : 하네스 작동 양상에서 관찰된 패턴
+#   - [SDE 추출]     : Self-Definition Extractor 추출 결과
+#   - [사용자 명시]  : 사용자 명시 결정
+#   - [Gap 추적]     : 선언 vs 관찰 차이 추적
+#
+# 수집 대상 5종:
+#   1. Mode override 누적
+#   2. MCP 출처 충돌 누적
+#   3. Best-of-N 결과 분포 (3/3 vs 2/1 vs 분산)
+#   4. 결재 미응답 패턴
+#   5. 자기 정의 변화 누적
+#
+# 임계치 자동 결재 (Blueprint (4) 영역 D):
+#   - Mode override 비율 > 30%
+#   - MCP 출처 충돌 > 5건/월
+#   - Best-of-N 분산 비율 > 10%
+#   - 결재 미응답 > 7일 (한 항목)
+#   - 자기 정의 동일 영역 충돌 ≥ 3회/월
+#
+# P6 정신: 데이터는 새지 않되, 교훈은 수집된다.
+#   - ✗ 잘못된 예: 실제 매출·고객명·API 응답 같은 운영 데이터 기록
+#   - ✓ 올바른 예: "Critical Path 작업에서 MCP 출처 fetch 실패 — TOOL_FAILED" 같은 메타 패턴만
+
+# (가상 예시 — 온보딩 후 실제 메타 피드백으로 대체됩니다)
+# [YYYY-MM-DDThh:mm:ssZ] [작동 관찰] Best-of-N=3 결과 3/3 수렴 — 채택 + Citation
