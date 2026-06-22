@@ -105,6 +105,28 @@ flowchart LR
 끝까지 실행하되, 중요한 인간 게이트(human gate)에서만 멈춥니다. 아래
 ["full-loop"](#full-loop--종단-간end-to-end-오케스트레이션)을 참조하세요.
 
+```mermaid
+flowchart TB
+  S1["1 · 프롬프트 구체화"] --> S2["2 · 조건부 리서치"] --> S3["3 · 계획·수용기준 동결"]
+  S3 --> G1{{"게이트 1<br/>계획 승인"}}
+  G1 --> S5["5 · 실행"]
+  S5 --> G2{{"게이트 2<br/>외부 영향<br/>(사전위임 / 큐)"}}
+  G2 --> S6["6 · 독립 검수<br/>Claude + 선택 codex"]
+  S6 --> D{"수용기준<br/>충족?"}
+  D -->|"충족"| S8["8 · 지식 적재"]
+  D -->|"미충족"| S7["7 · 재시도<br/>최대 3회"]
+  S7 --> S5
+  S7 -.->|"예산 소진"| G3{{"게이트 3<br/>정직하게 멈춤·질의"}}
+  classDef stage fill:#EDEAE0,stroke:#9A8C6A,color:#3a3320;
+  classDef gate fill:#3B3B8F,stroke:#25255e,color:#ffffff;
+  classDef decision fill:#F6D86B,stroke:#C9A227,color:#4a3c08;
+  classDef done fill:#2A9D8F,stroke:#1f7268,color:#ffffff;
+  class S1,S2,S3,S5,S6,S7 stage
+  class G1,G2,G3 gate
+  class D decision
+  class S8 done
+```
+
 ---
 
 ## 철학
@@ -193,28 +215,6 @@ MEMORY 출처의 정본(canonical)은 CLI 내장 auto-memory입니다. 하네스
   강제하며, 모델의 자기 보고에 의존하지 않습니다.
 - **재시도 소진** — 예산 내에 기준을 충족할 수 없으면, 거짓 성공을 선언하는 대신 정직하게
   멈추고 질의합니다.
-
-```mermaid
-flowchart TB
-  S1["1 · 프롬프트 구체화"] --> S2["2 · 조건부 리서치"] --> S3["3 · 계획·수용기준 동결"]
-  S3 --> G1{{"게이트 1<br/>계획 승인"}}
-  G1 --> S5["5 · 실행"]
-  S5 --> G2{{"게이트 2<br/>외부 영향<br/>(사전위임 / 큐)"}}
-  G2 --> S6["6 · 독립 검수<br/>Claude + 선택 codex"]
-  S6 --> D{"수용기준<br/>충족?"}
-  D -->|"충족"| S8["8 · 지식 적재"]
-  D -->|"미충족"| S7["7 · 재시도<br/>최대 3회"]
-  S7 --> S5
-  S7 -.->|"예산 소진"| G3{{"게이트 3<br/>정직하게 멈춤·질의"}}
-  classDef stage fill:#EDEAE0,stroke:#9A8C6A,color:#3a3320;
-  classDef gate fill:#3B3B8F,stroke:#25255e,color:#ffffff;
-  classDef decision fill:#F6D86B,stroke:#C9A227,color:#4a3c08;
-  classDef done fill:#2A9D8F,stroke:#1f7268,color:#ffffff;
-  class S1,S2,S3,S5,S6,S7 stage
-  class G1,G2,G3 gate
-  class D decision
-  class S8 done
-```
 
 다단계 작업 — 리서치 + 계획 + 빌드 + 검증 — 에, 인간 게이트에서 멈추는 무인 야간 실행을
 포함해 사용하세요. 한 줄 수정이나 빠른 질문에는 **사용하지 마세요**. 참조:
