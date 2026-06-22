@@ -8,7 +8,7 @@
 
 ![License](https://img.shields.io/badge/license-MIT-blue) ![Built for](https://img.shields.io/badge/built%20for-Claude%20Code-8A2BE2) ![For](https://img.shields.io/badge/for-non--developers-orange) ![Harness](https://img.shields.io/badge/harness-v0.1-green)
 
-**함께 사용한 도구** [insane-search](https://github.com/fivetaku/insane-search) · [deep-research](https://github.com/fivetaku/gptaku_plugins) — [fivetaku](https://github.com/fivetaku) 제작 (MIT) · 전체 출처 [CREDITS.md](../../CREDITS.md)
+**함께 포함된 Repo : 인사이트 주신 @fivetaku님께 감사드립니다 :)** [insane-search](https://github.com/fivetaku/insane-search) · [deep-research](https://github.com/fivetaku/gptaku_plugins) — [fivetaku](https://github.com/fivetaku) 제작 (MIT) · 전체 출처 [CREDITS.md](../../CREDITS.md) 
 
 > *"가장 개인적인 게 가장 창의적인 것이다."* — 마틴 스코세이지
 
