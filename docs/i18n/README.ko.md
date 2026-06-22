@@ -26,7 +26,7 @@
 
 ## W.A.Y?가 강조하는 세 가지
 
-### (1) 환각 방지 — SVOP (default-deny)
+### (1) 신뢰성 확보 : 할루시네이션 방지 — SVOP (Source-Verified Output Protocol, default-deny)
 
 모든 사실 주장은 6종의 신뢰 출처 중 하나로 추적되어야 합니다: **USER, READ(파일),
 BASH(셸), WEB, MEMORY, MCP(외부 시스템).** 그 외의 것은 단정하지 않습니다 — 자신 있는
