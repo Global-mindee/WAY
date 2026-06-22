@@ -1,7 +1,7 @@
-# W.A.Y? — Who Are You? (I'm not a developer)
+# W.A.Y? — Harness/Loop : Who Are You?
 
 <p align="center">
-  <img src="assets/hero.png" alt="W.A.Y? — Who Are You?" width="100%">
+  <img src="assets/hero.png" alt="W.A.Y? — Harness/Loop : Who Are You?" width="100%">
 </p>
 
 **Language:** [한국어](docs/i18n/README.ko.md) | [English](docs/i18n/README.en.md) | [中文](docs/i18n/README.zh.md)
