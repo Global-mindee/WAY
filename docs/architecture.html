@@ -1,0 +1,271 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>W.A.Y? — 하네스 구조 한눈에</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
+<style>
+  :root{
+    --bg:#f6f6f3; --panel:#ffffff; --ink:#1b1b1d; --muted:#6c6c72; --line:#e4e4de;
+    --accent:#5b4ff0; --phil:#efecff; --phil-b:#cdc4ff; --user:#e6f8f4; --user-b:#9fe3d6;
+    --rely:#fff2e3; --rely-b:#ffd29a; --ops:#eaeefb; --ops-b:#bcc8f5; --ink-soft:#3a3a40;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    font-family:'Pretendard Variable',Pretendard,-apple-system,BlinkMacSystemFont,system-ui,sans-serif;
+    background:var(--bg); color:var(--ink); line-height:1.65; padding:56px 20px 80px;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1080px;margin:0 auto}
+  header.top{text-align:center;margin-bottom:8px}
+  .badge{display:inline-block;font-size:12px;letter-spacing:.12em;color:var(--accent);
+    font-weight:700;text-transform:uppercase;border:1px solid var(--phil-b);
+    border-radius:999px;padding:4px 14px;margin-bottom:18px}
+  h1{font-size:34px;font-weight:800;letter-spacing:-.02em;margin-bottom:10px}
+  .lede{color:var(--muted);font-size:16px;max-width:640px;margin:0 auto 6px}
+  .meta{color:var(--muted);font-size:13px;margin-top:6px}
+  section{margin-top:52px}
+  .sec-head{display:flex;align-items:baseline;gap:12px;margin-bottom:18px;
+    border-bottom:1px solid var(--line);padding-bottom:10px}
+  .sec-no{font-size:13px;font-weight:800;color:var(--accent);letter-spacing:.05em}
+  .sec-title{font-size:20px;font-weight:800;letter-spacing:-.01em}
+  .sec-sub{font-size:13px;color:var(--muted);margin-left:auto}
+  /* flow row */
+  .flow{display:flex;align-items:stretch;gap:0;flex-wrap:wrap}
+  .node{background:var(--panel);border:1px solid var(--line);border-radius:12px;
+    padding:14px 16px;flex:1;min-width:150px;box-shadow:0 1px 2px rgba(0,0,0,.03)}
+  .node .nt{font-weight:700;font-size:14px;margin-bottom:3px}
+  .node .nd{font-size:12.5px;color:var(--muted)}
+  .arrow{display:flex;align-items:center;justify-content:center;color:var(--accent);
+    font-size:20px;font-weight:700;padding:0 10px;flex:0 0 auto}
+  .arrow.down{width:100%;padding:8px 0}
+  /* layers */
+  .layer{border-radius:14px;padding:18px 20px;margin-bottom:14px;border:1px solid}
+  .layer.phil{background:var(--phil);border-color:var(--phil-b)}
+  .layer.user{background:var(--user);border-color:var(--user-b)}
+  .layer.rely{background:var(--rely);border-color:var(--rely-b)}
+  .layer.ops{background:var(--ops);border-color:var(--ops-b)}
+  .layer .lh{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+  .layer .lh .tag{font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;
+    color:var(--ink-soft);opacity:.7}
+  .layer .lh .name{font-size:17px;font-weight:800}
+  .layer .lh .path{font-size:12px;color:var(--ink-soft);opacity:.65;margin-left:auto;
+    font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+  .chips{display:flex;flex-wrap:wrap;gap:8px}
+  .chip{background:rgba(255,255,255,.7);border:1px solid rgba(0,0,0,.07);border-radius:8px;
+    padding:6px 11px;font-size:13px;font-weight:600}
+  .chip small{display:block;font-weight:500;color:var(--muted);font-size:11.5px}
+  /* steps (full-loop) */
+  .steps{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+  .step{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px 13px;position:relative}
+  .step .s{font-size:11px;font-weight:800;color:var(--accent)}
+  .step .st{font-size:14px;font-weight:700;margin:2px 0 3px}
+  .step .sd{font-size:12px;color:var(--muted)}
+  .gate{border-color:var(--rely-b);background:var(--rely)}
+  .gate .s{color:#c2740a}
+  .legend{display:flex;gap:16px;flex-wrap:wrap;margin-top:14px;font-size:12.5px;color:var(--muted)}
+  .legend span{display:inline-flex;align-items:center;gap:6px}
+  .dot{width:11px;height:11px;border-radius:3px;display:inline-block}
+  /* tree */
+  .tree{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:20px 22px;
+    font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13.5px;line-height:1.9;overflow-x:auto}
+  .tree .d{color:var(--accent);font-weight:700}
+  .tree .c{color:var(--muted)}
+  .pill{display:inline-block;font-size:11px;font-weight:700;color:#fff;background:var(--accent);
+    border-radius:6px;padding:1px 7px;margin-left:6px;vertical-align:middle}
+  .pill.g{background:#0ea5a4}
+  .note{font-size:13px;color:var(--muted);margin-top:14px;padding:12px 16px;
+    background:var(--panel);border:1px dashed var(--line);border-radius:10px}
+  footer{margin-top:60px;text-align:center;color:var(--muted);font-size:12.5px;
+    border-top:1px solid var(--line);padding-top:20px}
+  footer a{color:var(--accent);text-decoration:none}
+  @media(max-width:720px){
+    .steps{grid-template-columns:repeat(2,1fr)}
+    .flow{flex-direction:column}
+    .arrow{transform:rotate(90deg);padding:6px 0}
+    h1{font-size:27px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <span class="badge">W.A.Y? · Architecture</span>
+    <h1>하네스 구조 한눈에</h1>
+    <p class="lede">W.A.Y?는 "무엇을 믿을 것인가"(신뢰성)와 "어떻게 끝까지 실행할 것인가"(자동화)를
+      얇고 강건한 원칙 위에 올린 1인용 AI 협업 하네스입니다. 아래는 그 구조를 흐름으로 본 그림입니다.</p>
+    <p class="meta">버전 v0.1 · 본 문서는 구조 이해용 도해입니다. 정본은 CLAUDE.md · harness-blueprint.md</p>
+  </header>
+
+  <!-- 1. 진입 흐름 -->
+  <section>
+    <div class="sec-head">
+      <span class="sec-no">01</span><span class="sec-title">작업이 들어오면</span>
+      <span class="sec-sub">모든 세션은 같은 순서로 시작합니다 (CLAUDE.md 0절)</span>
+    </div>
+    <div class="flow">
+      <div class="node"><div class="nt">사용자 발화</div><div class="nd">자연어 지시 한 줄</div></div>
+      <div class="arrow">&rarr;</div>
+      <div class="node"><div class="nt">자동 로드</div><div class="nd">self · decisions · rules · skills · agents 순서로 컨텍스트 적재</div></div>
+      <div class="arrow">&rarr;</div>
+      <div class="node"><div class="nt">분류 · 실행</div><div class="nd">Mode 판정 → 적합 skill/agent 채택 → 처리</div></div>
+      <div class="arrow">&rarr;</div>
+      <div class="node"><div class="nt">산출 · 적재</div><div class="nd">결과 + 교훈을 메모리·로그로 축적</div></div>
+    </div>
+  </section>
+
+  <!-- 2. 4층위 -->
+  <section>
+    <div class="sec-head">
+      <span class="sec-no">02</span><span class="sec-title">4개 층위로 쌓인 구조</span>
+      <span class="sec-sub">아래가 토대, 위로 갈수록 작업에 가까움</span>
+    </div>
+
+    <div class="layer phil">
+      <div class="lh"><span class="tag">토대</span><span class="name">철학 — 왜 존재하는가</span><span class="path">harness-blueprint.md</span></div>
+      <div class="chips">
+        <div class="chip">P1 Plan-First<small>결과 정의 전 실행 금지</small></div>
+        <div class="chip">P2 Sync-Before-Execute<small>90% 싱크 후 실행</small></div>
+        <div class="chip">P3 Plan-Execute 분리<small>계획=인간 / 실행=AI</small></div>
+        <div class="chip">P4 Immutability<small>환경 무관 동일 작동</small></div>
+        <div class="chip">P5 Data-Driven<small>데이터·관점 통로만 수용</small></div>
+        <div class="chip">P6 One-Way + Meta<small>데이터는 안 새고 교훈만 모임</small></div>
+        <div class="chip">AP1 비결정성=자산</div>
+        <div class="chip">AP2 명시성≠원칙</div>
+        <div class="chip">AP3 Push 기반 비격리</div>
+      </div>
+    </div>
+
+    <div class="arrow down">&darr;</div>
+
+    <div class="layer user">
+      <div class="lh"><span class="tag">누구를 위한 것</span><span class="name">사용자 모델 — self-definition</span><span class="path">self/</span></div>
+      <div class="chips">
+        <div class="chip">A 정체성</div><div class="chip">B 지식</div>
+        <div class="chip">C 사고방식<small>핵심 트리거</small></div>
+        <div class="chip">D 작업패턴<small>핵심 트리거</small></div>
+        <div class="chip">E 선호</div>
+        <div class="chip">SDE 추출<small>메모리→자기정의 자동화</small></div>
+        <div class="chip">변화추적 · Gap · 3-Tier 메모리</div>
+      </div>
+    </div>
+
+    <div class="arrow down">&darr;</div>
+
+    <div class="layer rely">
+      <div class="lh"><span class="tag">어떻게 믿는가</span><span class="name">신뢰성 — 추측을 구조적으로 차단</span><span class="path">rules/</span></div>
+      <div class="chips">
+        <div class="chip">SVOP<small>6출처 외 사실 차단</small></div>
+        <div class="chip">Mode Toggle<small>Research / Creative</small></div>
+        <div class="chip">fetch 의무<small>사실주장 시 외부조회</small></div>
+        <div class="chip">모름 5모드<small>추측 대신 정직 보고</small></div>
+        <div class="chip">Critical Path<small>Best-of-N (N=3)</small></div>
+        <div class="chip">MCP 신뢰도<small>High / Medium / Low</small></div>
+      </div>
+    </div>
+
+    <div class="arrow down">&darr;</div>
+
+    <div class="layer ops">
+      <div class="lh"><span class="tag">어떻게 지속되는가</span><span class="name">운영 — 축적과 결재</span><span class="path">memory/ · decisions/ · logs/</span></div>
+      <div class="chips">
+        <div class="chip">메모리 3-Tier<small>public / quarantine / archive</small></div>
+        <div class="chip">결재 흐름<small>pending.md · 무기한 대기</small></div>
+        <div class="chip">P6 메타 피드백<small>이벤트·패턴만 수집</small></div>
+        <div class="chip">운영데이터 외부 격리<small>하네스엔 메타만</small></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. 신뢰성 파이프라인 -->
+  <section>
+    <div class="sec-head">
+      <span class="sec-no">03</span><span class="sec-title">사실을 다루는 파이프라인</span>
+      <span class="sec-sub">"모르면 모른다고 한다"가 기본값</span>
+    </div>
+    <div class="flow">
+      <div class="node"><div class="nt">사실 주장 감지</div><div class="nd">수치·이름·날짜·고유명사</div></div>
+      <div class="arrow">&rarr;</div>
+      <div class="node"><div class="nt">fetch 의무</div><div class="nd">USER → BASH → READ → MCP → WEB → MEMORY</div></div>
+      <div class="arrow">&rarr;</div>
+      <div class="node"><div class="nt">성공 / 실패</div><div class="nd">실패 시 5모드 보고 (추측 금지)</div></div>
+      <div class="arrow">&rarr;</div>
+      <div class="node" style="border-color:var(--rely-b);background:var(--rely)"><div class="nt">Critical이면</div><div class="nd">Best-of-N 검증 N=3 · 분산 시 답변 보류</div></div>
+    </div>
+  </section>
+
+  <!-- 4. full-loop -->
+  <section>
+    <div class="sec-head">
+      <span class="sec-no">04</span><span class="sec-title">full-loop — 끝까지 자동 진행</span>
+      <span class="sec-sub">8단계 · 인간 게이트 3곳만 멈춤</span>
+    </div>
+    <div class="steps">
+      <div class="step"><div class="s">S1</div><div class="st">구체화</div><div class="sd">지시를 task-brief로</div></div>
+      <div class="step"><div class="s">S2</div><div class="st">조사</div><div class="sd">필요 시 시장·웹 리서치</div></div>
+      <div class="step"><div class="s">S3</div><div class="st">계획</div><div class="sd">AC 체크리스트 고정</div></div>
+      <div class="step gate"><div class="s">GATE 1</div><div class="st">계획 승인</div><div class="sd">인간 — 우회 금지</div></div>
+      <div class="step"><div class="s">S5</div><div class="st">실행</div><div class="sd">opus · 산출물 생성</div></div>
+      <div class="step gate"><div class="s">GATE 2</div><div class="st">외부 영향</div><div class="sd">push·발송은 승인 대기</div></div>
+      <div class="step"><div class="s">S6</div><div class="st">독립 검수</div><div class="sd">AC 명세·기능 실증</div></div>
+      <div class="step"><div class="s">S7</div><div class="st">재실행</div><div class="sd">FAIL만 차분 수정 (≤3)</div></div>
+      <div class="step gate"><div class="s">GATE 3</div><div class="st">재시도 한도</div><div class="sd">소진 시 정직 보고</div></div>
+      <div class="step"><div class="s">S8</div><div class="st">지식 적재</div><div class="sd">교훈→메모리 · 이벤트→로그</div></div>
+    </div>
+    <div class="legend">
+      <span><i class="dot" style="background:var(--panel);border:1px solid var(--line)"></i> 자동 단계</span>
+      <span><i class="dot" style="background:var(--rely);border:1px solid var(--rely-b)"></i> 인간 게이트 (절대 우회 안 함)</span>
+    </div>
+  </section>
+
+  <!-- 5. 온보딩 -->
+  <section>
+    <div class="sec-head">
+      <span class="sec-no">05</span><span class="sec-title">온보딩 — '나'를 자산으로</span>
+      <span class="sec-sub">개발자가 아니어도, 한 번만</span>
+    </div>
+    <div class="flow">
+      <div class="node"><div class="nt">이미 쌓인 것</div><div class="nd">대화·설정·레포·커밋 리듬</div></div>
+      <div class="arrow">&rarr;</div>
+      <div class="node" style="border-color:var(--user-b);background:var(--user)"><div class="nt">sde-extractor</div><div class="nd">읽기만 · 확신도 마커 (확인/추정/미확인)</div></div>
+      <div class="arrow">&rarr;</div>
+      <div class="node"><div class="nt">self-definition 초안</div><div class="nd">5영역 자동 작성 · 모르는 건 한 번에 질문</div></div>
+      <div class="arrow">&rarr;</div>
+      <div class="node"><div class="nt">검토 · 승인</div><div class="nd">사람이 확인하는 유일한 단계</div></div>
+    </div>
+    <div class="note">핵심: 추출기는 환경을 <b>읽기만</b> 합니다. 무엇을 '나'로 확정할지는 항상 사람의 승인을 거칩니다 (P2 · 결재 흐름).</div>
+  </section>
+
+  <!-- 6. 디렉토리 맵 -->
+  <section>
+    <div class="sec-head">
+      <span class="sec-no">06</span><span class="sec-title">디렉토리 지도</span>
+      <span class="sec-sub">어디에 무엇이 있는가</span>
+    </div>
+    <div class="tree">
+<span class="d">CLAUDE.md</span>            <span class="c"># 모든 에이전트가 자동 로드하는 입구 지침</span>
+<span class="d">harness-blueprint.md</span> <span class="c"># 설계도 (철학·4층위·원칙)</span>
+<span class="d">self/</span>                <span class="c"># 자기 정의 + 변화·충돌·배경 로그</span> <span class="pill g">온보딩이 채움</span>
+<span class="d">rules/</span>               <span class="c"># 신뢰성 규칙 (SVOP·Mode·fetch·Critical·MCP)</span>
+<span class="d">skills/</span>              <span class="c"># 재사용 스킬 (sde-extractor · full-loop 포함)</span>
+<span class="d">agents/</span>              <span class="c"># 작업 유형별 서브에이전트</span>
+<span class="d">memory/</span>              <span class="c"># 3-Tier (public / quarantine / archive)</span>
+<span class="d">decisions/</span>           <span class="c"># 결재 큐 (pending.md) + archive</span>
+<span class="d">logs/</span>                <span class="c"># 가벼운 추적 (operations · decisions · meta-feedback)</span>
+<span class="d">projects/</span>            <span class="c"># 프로젝트 메타만 (운영데이터는 외부 레포)</span> <span class="pill">P6 격리</span>
+<span class="d">docs/i18n/</span>           <span class="c"># 다국어 README (ko / en / zh)</span>
+    </div>
+  </section>
+
+  <footer>
+    W.A.Y? — Who Are You? (I'm not a developer) ·
+    <a href="https://github.com/minjun8702-byte/WAY">github.com/minjun8702-byte/WAY</a> ·
+    MIT · 구조 도해 v0.1
+  </footer>
+
+</div>
+</body>
+</html>

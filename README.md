@@ -118,6 +118,9 @@ See [`skills/07_orchestration/full-loop/SKILL.md`](skills/07_orchestration/full-
 
 ## Directory structure
 
+> Prefer a picture? Open [`docs/architecture.html`](docs/architecture.html) in a browser
+> for a one-page diagram of how the harness is put together.
+
 | Path | Role |
 |------|------|
 | `CLAUDE.md` | Base instructions every AI agent auto-loads here |
@@ -132,6 +135,7 @@ See [`skills/07_orchestration/full-loop/SKILL.md`](skills/07_orchestration/full-
 | `projects/` | Per-project meta-info only (operational data lives in external repos) |
 | `_reference/` | External reference material (citation/insight, not execution) |
 | `docs/i18n/` | Localized READMEs (ko / en / zh) |
+| `docs/architecture.html` | One-page visual architecture diagram (open in a browser) |
 
 ---
 
