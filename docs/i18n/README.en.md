@@ -38,7 +38,7 @@ to grow an environment that's even more you — precisely, and flexibly.
 
 ## Three things W.A.Y? emphasizes
 
-### (1) Anti-hallucination — SVOP (default-deny)
+### (1) Reliability first: anti-hallucination — SVOP (Source-Verified Output Protocol, default-deny)
 
 Every factual claim must trace to one of six trusted sources: **USER, READ (file), BASH
 (shell), WEB, MEMORY, MCP (external system).** Anything else is not asserted — it is
@@ -48,24 +48,99 @@ answer the user seems to want. The rule was born from a real failure (a
 financial-institution identifier hallucinated as a plausible-but-wrong code) and
 generalized: if the sources came up empty, say so and name which sources you tried.
 
-### (2) Structure
+```mermaid
+flowchart LR
+  C["Factual claim<br/>numbers·names·dates·quotes"] --> Q{"Traceable to<br/>6 sources?"}
+  Q -->|"USER·READ·BASH<br/>WEB·MEMORY·MCP"| A["Assert + source marker"]
+  Q -->|"No source"| H["Hold → honest report, 5 modes<br/>UNKNOWN·PARTIAL·TOOL_FAILED<br/>OUT_OF_SCOPE·UNCERTAIN"]
+  classDef start fill:#EDEAE0,stroke:#9A8C6A,color:#3a3320;
+  classDef decision fill:#F6D86B,stroke:#C9A227,color:#4a3c08;
+  classDef accept fill:#2A9D8F,stroke:#1f7268,color:#ffffff;
+  classDef hold fill:#E76F51,stroke:#b8472f,color:#ffffff;
+  class C start
+  class Q decision
+  class A accept
+  class H hold
+```
 
-A small set of load-bearing rules that never break is stronger than many rules that
-bend. The structure stays identical across tasks, machines, and models (the
-immutability principle), which is what makes behavior predictable enough to trust.
+### (2) Consistency: a core structure that never breaks (immutability)
 
-### (3) Knowledge accumulation
+This is the harness's core thesis — rules are stronger the simpler they are, but they
+must never break under any circumstance. A small set of load-bearing rules that never
+break is stronger than many rules that bend. Because the structure stays the same across
+tasks, machines, and models (the immutability principle), the harness behaves like an
+*immutable OS* across projects. That predictability is the very foundation that lets
+(1) anti-hallucination and (3) knowledge accumulation work identically every time.
+
+```mermaid
+flowchart LR
+  A["Different task"] --> K["A few load-bearing rules<br/>that never break (immutability)"]
+  B["Different machine"] --> K
+  M["Different model"] --> K
+  K --> O["Always the same behavior<br/>= immutable OS"]
+  O --> R["Predictability → trust<br/>→ (1)·(3) build on top"]
+  classDef input fill:#EDEAE0,stroke:#9A8C6A,color:#3a3320;
+  classDef core fill:#3B3B8F,stroke:#25255e,color:#ffffff;
+  classDef out fill:#2A9D8F,stroke:#1f7268,color:#ffffff;
+  class A,B,M input
+  class K core
+  class O,R out
+```
+
+### (3) Compounding growth: knowledge that accumulates without leaking
 
 Each task can leave the harness slightly more capable — research outputs to the right
 knowledge store, lessons to memory, a one-line event to the log — all without leaking
 operational data. The harness compounds over time and never silently overwrites durable
 knowledge.
 
-### And then: full-loop
+```mermaid
+flowchart LR
+  W["Do the work"] --> S{"Sort outputs<br/>(no operational-data leak)"}
+  S -->|"research output"| K["knowledge store"]
+  S -->|"lesson"| Me["memory"]
+  S -->|"one-line event"| L["log"]
+  K --> N["Next task is more capable"]
+  Me --> N
+  L --> N
+  N -. "compounds" .-> W
+  classDef work fill:#EDEAE0,stroke:#9A8C6A,color:#3a3320;
+  classDef decision fill:#F6D86B,stroke:#C9A227,color:#4a3c08;
+  classDef store fill:#2A9D8F,stroke:#1f7268,color:#ffffff;
+  classDef gain fill:#88C9A1,stroke:#4f9b6e,color:#14301f;
+  class W work
+  class S decision
+  class K,Me,L store
+  class N gain
+```
+
+### +alpha slash command: /full-loop
 
 The three properties above are the foundation. **full-loop** is the payoff — it runs a
 single instruction end-to-end through eight stages while stopping only at the human
 gates that matter. See ["full-loop"](#full-loop--end-to-end-orchestration) below.
+
+```mermaid
+flowchart LR
+  S1["1 · Refine prompt"] --> S2["2 · Conditional research"] --> S3["3 · Plan · freeze criteria"]
+  S3 --> G1{{"Gate 1<br/>Plan approval"}}
+  G1 --> S5["5 · Execute"]
+  S5 --> G2{{"Gate 2<br/>External impact<br/>(pre-approve / queue)"}}
+  G2 --> S6["6 · Independent review<br/>Claude + optional codex"]
+  S6 --> D{"Criteria<br/>met?"}
+  D -->|"met"| S8["8 · Knowledge deposit"]
+  D -->|"not met"| S7["7 · Retry<br/>max 3"]
+  S7 --> S5
+  S7 -.->|"budget spent"| G3{{"Gate 3<br/>Stop honestly · ask"}}
+  classDef stage fill:#EDEAE0,stroke:#9A8C6A,color:#3a3320;
+  classDef gate fill:#3B3B8F,stroke:#25255e,color:#ffffff;
+  classDef decision fill:#F6D86B,stroke:#C9A227,color:#4a3c08;
+  classDef done fill:#2A9D8F,stroke:#1f7268,color:#ffffff;
+  class S1,S2,S3,S5,S6,S7 stage
+  class G1,G2,G3 gate
+  class D decision
+  class S8 done
+```
 
 ---
 
