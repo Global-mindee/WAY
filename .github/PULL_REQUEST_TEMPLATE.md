@@ -25,7 +25,7 @@ What does this change do, and why? One or two plain-language sentences.
 
 - [ ] **No personal information.** No real names, emails, private numbers, customer
       data, or contents of git-isolated folders anywhere in the diff. (The public repo
-      URL `github.com/minjun8702-byte/WAY` is fine — that account is public.)
+      URL `github.com/Global-mindee/WAY` is fine — that account is public.)
 - [ ] **No operational data.** Only meta-information (events, patterns, definitions,
       statistics) is added — real operational data stays in external project repos
       (principle P6: data doesn't leak, lessons do).

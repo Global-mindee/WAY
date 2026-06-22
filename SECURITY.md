@@ -64,7 +64,7 @@ Use, in order of preference:
 
 1. **GitHub Security Advisory (preferred).** Open a private advisory through the
    repository's Security tab:
-   `https://github.com/minjun8702-byte/WAY/security/advisories/new`
+   `https://github.com/Global-mindee/WAY/security/advisories/new`
    This keeps the report confidential between you and the maintainers until a fix is
    ready.
 2. **A private channel** arranged via the repository, if a Security Advisory is not

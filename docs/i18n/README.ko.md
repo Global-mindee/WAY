@@ -201,7 +201,7 @@ MEMORY 출처의 정본(canonical)은 CLI 내장 auto-memory입니다. 하네스
 
 ```bash
 # 1. 하네스를 클론합니다
-git clone https://github.com/minjun8702-byte/WAY.git
+git clone https://github.com/Global-mindee/WAY.git
 cd WAY
 
 # 2. (선택) Claude Code 안에서 웹 리서치 플러그인을 설치합니다

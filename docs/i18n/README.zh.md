@@ -201,7 +201,7 @@ MEMORY 来源的正本（canonical）是 CLI 内置的 auto-memory；框架的 `
 
 ```bash
 # 1. 克隆框架
-git clone https://github.com/minjun8702-byte/WAY.git
+git clone https://github.com/Global-mindee/WAY.git
 cd WAY
 
 # 2.（可选）在 Claude Code 内安装网络研究插件

@@ -218,7 +218,7 @@ Only the first two are required. Everything else is opt-in and the harness runs 
 
 ```bash
 # 1. Clone the harness
-git clone https://github.com/minjun8702-byte/WAY.git
+git clone https://github.com/Global-mindee/WAY.git
 cd WAY
 
 # 2. (optional) Install web-research plugins inside Claude Code
