@@ -8,13 +8,13 @@ If you redistribute or fork W.A.Y?, keep this attribution intact.
 
 ## Plugins
 
-### insane-search (v0.4.1)
+### insane-search (v0.8.2)
 
 - **Author**: fivetaku
 - **License**: MIT
 - **Source**: github.com/fivetaku/insane-search
 - **Distribution**: `gptaku-plugins` marketplace
-- **Role in W.A.Y?**: Adaptive bypass for blocked sources during web research.
+- **Role in W.A.Y?**: Adaptive access for blocked sources during web research.
   When ordinary `WebFetch` / `WebSearch` is blocked, returns empty, or times out
   (social platforms, commerce portals, news aggregators, region-locked sites), the
   harness escalates to insane-search before falling back to the "unknown" reporting
@@ -63,11 +63,16 @@ license, which governs that component — consult the respective project for ter
 
 | Component | Purpose |
 |-----------|---------|
-| curl_cffi | TLS impersonation for fetching bot-protected pages |
+| curl_cffi (≥ 0.15.0) | TLS impersonation (Chrome 146, HTTP/3) for bot-protected pages; SSRF-safe redirects |
 | yt-dlp | Media/transcript extraction across a large catalog of sites |
 | Jina Reader | Readable-content extraction from arbitrary URLs |
 | feedparser | RSS / Atom feed parsing |
 | Playwright | Real-Chrome headless fetch for the hardest WAF cases |
+| Patchright (optional) | Drop-in Playwright replacement when installed (added v0.6.0) |
+
+Since v0.8.0, insane-search caches per-host successful routes in `~/.insane_search/learned.json`
+(home directory, outside any repo — never committed). It holds routing hints only, not
+operational data, and can be disabled with `INSANE_LEARN=0`.
 
 ---
 

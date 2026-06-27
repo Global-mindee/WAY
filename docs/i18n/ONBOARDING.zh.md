@@ -36,7 +36,7 @@ cd WAY
 
 W.A.Y? 不装任何插件也能运行。若想要更强的网络研究能力，推荐两个：
 
-- **insane-search** —— 针对被封锁/受机器人防护来源的自适应绕过，使市场与网络研究不会
+- **insane-search** —— 针对被封锁/受机器人防护来源的自适应访问，使市场与网络研究不会
   悄然丢失数据。（fivetaku，MIT —— 见 `CREDITS.md`。）
 - **deep-research** —— 多来源、经事实核查的研究与带引用的综合，与 full-loop 的研究阶段
   相配。（fivetaku —— 见 `CREDITS.md`。）

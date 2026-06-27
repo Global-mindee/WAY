@@ -83,19 +83,20 @@ WebFetch / WebSearch 호출 시:
 
 이는 `rules/mcp-trust-levels.md` 의 등급 체계와 호환. WEB Low는 본 결재에서 정의 안 했으며, 미확인 출처일 때 한해 `[UNCERTAIN]` 마커 부착으로 대체.
 
-### 시장분석 웹 fetch — insane-search 우선 활용
+### 시장분석 웹 fetch — insane-search 우선 활용 (2026-06-27 v0.8.2 동기화)
 
 **시장분석(market analysis) 목적으로 웹 조회(fetch)를 진행할 때는 `insane-search` 스킬을 우선 활용합니다.**
 
 - **트리거**: 시장 규모·경쟁사·가격·점유율·트렌드·수요 등 시장분석 목적의 외부 웹 조회
-- **이유**: 일반 WebFetch/WebSearch가 차단당하는 소스(X/Twitter, Reddit, Stack Overflow, LinkedIn, 커머스·소셜·뉴스 포털 등) 접근을 Phase 0→3 적응형 스케줄러로 우회 → 시장 데이터 누락·편향 방지
+- **이유**: 일반 WebFetch/WebSearch가 차단당하는 소스(X/Twitter, Reddit, Stack Overflow, LinkedIn, 커머스·소셜·뉴스 포털 등)를 **Phase 0 공식 API 라우터 → Phase 1 적응형 격자(curl_cffi TLS 임퍼소네이션) → Phase 3 Playwright** 순으로 적응형 접근(adaptive access) → 시장 데이터 누락·편향 방지
 - **적용 규칙**:
   - 차단 가능성이 높은 소스(소셜·커머스·뉴스 포털·해외 사이트)는 **처음부터 insane-search 우선**
-  - 일반 WebFetch/WebSearch가 차단·빈 결과·타임아웃 반환 시 **즉시 insane-search로 에스컬레이션** (5모드 보고 전 1차 우회 시도)
+  - 일반 WebFetch/WebSearch가 차단·빈 결과·타임아웃 반환 시 **즉시 insane-search로 에스컬레이션** (5모드 보고 전 1차 시도)
   - 미설치 환경에서는 WebSearch 폴백 + `[PARTIAL]` 명시 (무음 강등 금지)
 - **출처 표기**: insane-search 경유 결과도 WEB 출처로 동일 표기 — `[W: <url>]`
-- **출처(attribution)**: insane-search by **fivetaku**, MIT License — `github.com/fivetaku/insane-search`, `gptaku-plugins` 마켓플레이스. 외부 플러그인이므로 공개본은 코드 미포함·참조/설치 안내만 제공합니다.
+- **출처(attribution)**: insane-search **v0.8.2** by **fivetaku**, MIT License — `github.com/fivetaku/insane-search`, `gptaku-plugins` 마켓플레이스. 외부 플러그인이므로 공개본은 코드 미포함·참조/설치 안내만 제공합니다.
 - **유의**: 본 도구는 접근 제한 우회(TLS 임퍼소네이션 등) 성격을 가지므로, 적법한 시장조사·연구 목적에 한해 사용합니다.
+- **신규 인지 (v0.8.2)**: v0.8.0부터 호스트별 성공 경로를 `~/.insane_search/learned.json`(홈·git 외부)에 캐시하는 자가학습 추가(라우팅 힌트, `INSANE_LEARN=0`로 비활성). v0.6.0부터 SSRF/리다이렉트 가드·curl_cffi≥0.15.0 적용.
 
 ---
 

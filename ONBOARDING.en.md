@@ -40,7 +40,7 @@ cd WAY
 
 W.A.Y? runs without any plugins. Two are recommended if you want stronger web research:
 
-- **insane-search** — adaptive bypass for blocked / bot-protected sources, so market
+- **insane-search** — adaptive access for blocked / bot-protected sources, so market
   and web research does not silently lose data. (fivetaku, MIT — see `CREDITS.md`.)
 - **deep-research** — multi-source, fact-checked research with cited synthesis, pairing
   with the full-loop research phase. (fivetaku — see `CREDITS.md`.)

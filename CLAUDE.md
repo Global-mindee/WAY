@@ -130,18 +130,19 @@
 
 **추측 fallback 금지**. fetch 실패는 반드시 "I don't know" 발동.
 
-### 시장분석 웹 fetch — insane-search 필수
+### 시장분석 웹 fetch — insane-search 필수 (2026-06-27 v0.8.2 동기화)
 
 **시장분석(market analysis) 목적으로 웹 조회(fetch)를 진행할 때는 `insane-search` 스킬을 필수 활용한다.**
 
 - **트리거**: 시장 규모·경쟁사·가격·점유율·트렌드·수요 등 시장분석 목적의 외부 웹 조회
-- **이유**: 일반 WebFetch/WebSearch가 차단당하는 소스(X/Twitter, Reddit, Stack Overflow, Naver, Coupang, LinkedIn 등) 접근을 Phase 0→3 적응형 스케줄러로 우회 → 시장 데이터 누락·편향 방지
+- **이유**: 일반 WebFetch/WebSearch가 차단당하는 소스(X/Twitter, Reddit, Stack Overflow, Naver, Coupang, LinkedIn 등)를 **Phase 0 공식 API 라우터(phase0.py) → Phase 1 적응형 격자(curl_cffi TLS 임퍼소네이션) → Phase 3 Playwright** 순으로 적응형 접근(adaptive access) → 시장 데이터 누락·편향 방지
 - **적용 규칙**:
   - 차단 가능성이 높은 소스(소셜·커머스·뉴스 포털·해외 사이트)는 **처음부터 insane-search 우선**
-  - 일반 WebFetch/WebSearch가 차단·빈 결과·타임아웃 반환 시 **즉시 insane-search로 에스컬레이션** (5모드 보고 전 1차 우회 시도 의무)
+  - 일반 WebFetch/WebSearch가 차단·빈 결과·타임아웃 반환 시 **즉시 insane-search로 에스컬레이션** (5모드 보고 전 1차 시도 의무)
 - **출처 표기**: insane-search 경유 결과도 WEB 출처로 동일 표기 — `[W: <url>]`
-- **출처(플러그인)**: `insane-search` (by fivetaku, MIT License — github.com/fivetaku/insane-search, gptaku-plugins marketplace). user 스코프, enabled. 스킬은 세션 재시작 후 활성화됨
+- **출처(플러그인)**: `insane-search` **v0.8.2** (by fivetaku, MIT License — github.com/fivetaku/insane-search, gptaku-plugins marketplace). user 스코프, enabled. 갱신 적용은 세션 재시작/`/reload-plugins` 후
 - **유의**: 본 도구는 접근 제한 우회(TLS 임퍼소네이션 등) 성격을 가지므로, 적법한 시장조사·연구 목적에 한해 사용
+- **신규 인지 (v0.8.2)**: (1) v0.8.0부터 호스트별 성공 경로를 `~/.insane_search/learned.json`(홈 디렉터리·git 외부)에 캐시하는 자가학습 추가 — 라우팅 힌트일 뿐 운영 데이터 아님, 필요 시 `INSANE_LEARN=0`으로 비활성. (2) v0.6.0부터 SSRF/리다이렉트 가드(내부망·loopback·메타데이터 IP 차단)·curl_cffi≥0.15.0 적용
 
 ---
 

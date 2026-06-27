@@ -262,7 +262,7 @@ MEMORY 来源的正本（canonical）是 CLI 内置的 auto-memory；框架的 `
 |------|------|
 | **Claude Code**（或任何能读取你的记忆、git 历史与设置的 CLI 智能体） | 运行框架与抽取步骤 |
 | **git** | 克隆仓库；抽取器会读取你的提交节奏 |
-| 可选插件：**insane-search**、**deep-research** | 更强的网络研究（绕过被封锁的来源、多来源事实核查） |
+| 可选插件：**insane-search**、**deep-research** | 更强的网络研究（自适应访问被封锁的来源、多来源事实核查） |
 | 可选：**codex / GPT-5.5**（付费，可选启用） | full-loop 内部的异厂（cross-vendor）独立评审 |
 
 只有前两项是必需的。其余一切均为可选启用，没有它们框架也能运行。
@@ -279,8 +279,10 @@ git clone https://github.com/Global-mindee/WAY.git
 cd WAY
 
 # 2.（可选）在 Claude Code 内安装网络研究插件
-/plugin install insane-search
+/plugin marketplace add github.com/fivetaku/gptaku_plugins.git
+/plugin install insane-search@gptaku-plugins
 /plugin install deep-research
+/reload-plugins
 
 # 3. 入门 —— 抽取器读取你的 CLI 记忆、git 与设置，
 #    然后起草你的自我定义（self-definition）

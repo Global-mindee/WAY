@@ -40,7 +40,7 @@ cd WAY
 W.A.Y?는 어떤 플러그인 없이도 작동합니다. 더 강한 웹 리서치를 원한다면 두 가지를
 권장합니다:
 
-- **insane-search** — 차단/봇 보호된 출처에 대한 적응형 우회로, 시장·웹 리서치가 조용히
+- **insane-search** — 차단/봇 보호된 출처에 대한 적응형 접근으로, 시장·웹 리서치가 조용히
   데이터를 잃지 않게 합니다. (fivetaku, MIT — `CREDITS.md` 참조.)
 - **deep-research** — 다중 출처·사실 검증 리서치와 인용 종합으로, full-loop 리서치
   단계와 짝을 이룹니다. (fivetaku — `CREDITS.md` 참조.)

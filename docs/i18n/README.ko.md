@@ -262,7 +262,7 @@ MEMORY 출처의 정본(canonical)은 CLI 내장 auto-memory입니다. 하네스
 |-----------|------------|
 | **Claude Code** (또는 당신의 기억·git 이력·설정을 읽을 수 있는 모든 CLI 에이전트) | 하네스 실행 및 추출 단계 |
 | **git** | 저장소 클론; 추출기가 당신의 커밋 리듬을 읽습니다 |
-| 선택 플러그인: **insane-search**, **deep-research** | 더 강력한 웹 리서치 (차단된 출처 우회, 다중 출처 사실 검증) |
+| 선택 플러그인: **insane-search**, **deep-research** | 더 강력한 웹 리서치 (차단된 출처에 적응형 접근, 다중 출처 사실 검증) |
 | 선택: **codex / GPT-5.5** (유료, opt-in) | full-loop 내부의 이종(cross-vendor) 독립 검수 |
 
 앞의 두 가지만 필수입니다. 나머지는 전부 opt-in이며, 없어도 하네스는 작동합니다.
@@ -279,8 +279,10 @@ git clone https://github.com/Global-mindee/WAY.git
 cd WAY
 
 # 2. (선택) Claude Code 안에서 웹 리서치 플러그인을 설치합니다
-/plugin install insane-search
+/plugin marketplace add github.com/fivetaku/gptaku_plugins.git
+/plugin install insane-search@gptaku-plugins
 /plugin install deep-research
+/reload-plugins
 
 # 3. 온보딩 — 추출기가 당신의 CLI 기억·git·설정을 읽어,
 #    당신의 자기 정의(self-definition)를 초안으로 작성합니다

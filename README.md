@@ -149,7 +149,7 @@ background in [CONCEPT.en.md](CONCEPT.en.md).
 |-------------|-----------|
 | **Claude Code** (or any CLI agent that can read your memory, git history, and settings) | Running the harness and the extraction step |
 | **git** | Cloning the repo; the extractor reads your commit rhythm |
-| Optional plugins: **insane-search**, **deep-research** | Stronger web research (bypasses blocked sources, multi-source fact-checking) |
+| Optional plugins: **insane-search**, **deep-research** | Stronger web research (adaptively accesses blocked sources, multi-source fact-checking) |
 | Optional: **codex / GPT-5.5** (paid, opt-in) | Cross-vendor independent review inside full-loop |
 
 Only the first two are required. Everything else is opt-in and the harness runs without it.
@@ -166,8 +166,10 @@ git clone https://github.com/Global-mindee/WAY.git
 cd WAY
 
 # 2. (optional) Install web-research plugins inside Claude Code
-/plugin install insane-search
+/plugin marketplace add github.com/fivetaku/gptaku_plugins.git
+/plugin install insane-search@gptaku-plugins
 /plugin install deep-research
+/reload-plugins
 
 # 3. Onboard — the extractor reads your CLI memory, git, and settings,
 #    then drafts your self-definition
